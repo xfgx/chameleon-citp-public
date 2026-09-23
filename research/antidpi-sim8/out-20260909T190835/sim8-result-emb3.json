@@ -1,0 +1,101 @@
+{
+  "emb_cadence": 3,
+  "space": 36,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "n_slots": 120,
+  "nmse_max": 0.1,
+  "lat_max": 0.25,
+  "lambda": 0.3,
+  "independent": {
+    "policy": {
+      "gap": "profile",
+      "size": "profile",
+      "m8": "separate",
+      "react": "silent"
+    },
+    "D": 1.0,
+    "nmse": 0.03550208255858577,
+    "latency": 0.05,
+    "cost": 0.44999999999999996,
+    "feasible": true,
+    "J": 1.135
+  },
+  "joint_chaos": {
+    "policy": {
+      "gap": "profile",
+      "size": "profile",
+      "m8": "embedded",
+      "react": "burst"
+    },
+    "D": 0.18770833333333337,
+    "nmse": 0.06311309632957823,
+    "latency": 0.05,
+    "cost": 0.35,
+    "feasible": true,
+    "J": 0.29270833333333335
+  },
+  "joint_prf": {
+    "policy": {
+      "gap": "profile",
+      "size": "profile",
+      "m8": "embedded",
+      "react": "silent"
+    },
+    "D": 0.18989583333333337,
+    "nmse": 0.0,
+    "latency": 0.05,
+    "cost": 0.15000000000000002,
+    "feasible": true,
+    "J": 0.2348958333333334
+  },
+  "n_feasible_chaos": 18,
+  "n_feasible_embedded": 6,
+  "top3_chaos": [
+    {
+      "policy": {
+        "gap": "profile",
+        "size": "profile",
+        "m8": "embedded",
+        "react": "burst"
+      },
+      "D": 0.18770833333333337,
+      "nmse": 0.06311309632957823,
+      "latency": 0.05,
+      "cost": 0.35,
+      "feasible": true,
+      "J": 0.29270833333333335
+    },
+    {
+      "policy": {
+        "gap": "uniform",
+        "size": "profile",
+        "m8": "embedded",
+        "react": "burst"
+      },
+      "D": 0.8259374999999999,
+      "nmse": 0.06311309632957823,
+      "latency": 0.05,
+      "cost": 0.35,
+      "feasible": true,
+      "J": 0.9309374999999999
+    },
+    {
+      "policy": {
+        "gap": "profile",
+        "size": "fixed",
+        "m8": "embedded",
+        "react": "burst"
+      },
+      "D": 1.0,
+      "nmse": 0.06311309632957823,
+      "latency": 0.05,
+      "cost": 0.25,
+      "feasible": true,
+      "J": 1.075
+    }
+  ]
+}

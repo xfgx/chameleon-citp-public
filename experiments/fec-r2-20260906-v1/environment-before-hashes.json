@@ -1,0 +1,7 @@
+{
+  "ip -6 route show": "515c24ed2204018e3128d091e6f3c3a0de76ef57d86fe0f5989ef02b6f7f4081",
+  "ip -6 rule show": "d160618a80c39b20c4c1c6b8b02146f9a437ad0260355aba9971a42ea5ca9a96",
+  "ip route show": "2c4691184b39bd398f4d1ec264ce9b3025622f8d8d3020f5fd0efe988a7d53e8",
+  "ip rule show": "cd658a0f1c86d1dc9030e46151c04d3681de36812753d738e064d54cadfb3c14",
+  "systemctl show ks-vpn-node ks-vpn-exit ks-vpn-hub ks-vpn-phone ks-admin chaossync-server cham-server -p Id -p ActiveState -p MainPID -p NRestarts": "a2910daec4724ff8acb713d8121113b3048f1f7594ebe7a28f894775c2848069"
+}

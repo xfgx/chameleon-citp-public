@@ -1,0 +1,10 @@
+{
+  "completed": true,
+  "runs": [
+    "main",
+    "confirmation"
+  ],
+  "binary_sha256": "64249521c5f07f330f1be3cb40b91b6032cfc18c625a8364233d444294026da5",
+  "production_unchanged": true,
+  "note": "Independent raw-data verification is a separate next step."
+}

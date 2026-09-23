@@ -1,0 +1,60 @@
+{
+  "tests.jsonl": {
+    "root_test_passes": 7,
+    "subtest_passes": 9,
+    "root_tests": [
+      "TestAllDownAndNoDiscovery",
+      "TestFixtureNeverOverwrites",
+      "TestFraming",
+      "TestInvalidFrameDoesNotDial",
+      "TestPolicy",
+      "TestRealSocketsFailover",
+      "TestWrongIdentityAndClient"
+    ],
+    "failures": 0,
+    "package_pass": true,
+    "sha256": "41cb54e3cf84c96d3626ad76de9b1f5cbd1f399c686366d34ebb17f56f033aa1"
+  },
+  "race-tests.jsonl": {
+    "root_test_passes": 21,
+    "subtest_passes": 27,
+    "root_tests": [
+      "TestAllDownAndNoDiscovery",
+      "TestFixtureNeverOverwrites",
+      "TestFraming",
+      "TestInvalidFrameDoesNotDial",
+      "TestPolicy",
+      "TestRealSocketsFailover",
+      "TestWrongIdentityAndClient"
+    ],
+    "failures": 0,
+    "package_pass": true,
+    "sha256": "0504f45c61eebaa4a31e65804d7eb9c0e46836d0f849c1210dfd8171c30bb549"
+  },
+  "captures": {
+    "alias-ru.pcap": {
+      "bytes": 24,
+      "sha256": "704e5e5b3234433c01fcfd1b20a306e77e985038120492dc53965c3edd38a4ea"
+    },
+    "mcp-test-traffic.pcap": {
+      "bytes": 23108,
+      "sha256": "1b12d171250d17aef1fffc49c5dae9612808a76400971247ca58385074daf661"
+    },
+    "primary-control-ru.pcap": {
+      "bytes": 9432,
+      "sha256": "1de8cc06efba3be33b484bdf705852072338c9968011dee9753e0c58c38a196b"
+    }
+  },
+  "build_hashes": "8cdcc42e1f1084400d99fa6cc2fa814d93847c20e6535aa2e0b63bbcf36dd8a4  main.go\n38c00169028554b7b246f08e96d34438efeaf34aee382a27076218fcbf6aadce  main_test.go\n81f5c09ce49379a367e8725ad5580f18bf4c2aa7ebee4ae90ea0f242baeec5fd  go.mod\na809d0d3ad3a2fe657246c23a01aa09139e7861cc99050e4f49cfbd4c6d7c3d9  ks-endpoint-linux-amd64\nda84e05c8279fee26edb576725faf653acc396ced0f1fc07a3019853030cef0d  ks-endpoint-windows-amd64.exe\n",
+  "health": {
+    "routes4_unchanged": true,
+    "routes6_unchanged": true,
+    "rules4_unchanged": true,
+    "rules6_unchanged": true,
+    "nft_unchanged": true,
+    "netns_unchanged": true,
+    "services_unchanged": true
+  },
+  "vet_log_bytes": 0,
+  "race_exit": "0"
+}

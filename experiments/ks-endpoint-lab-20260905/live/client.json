@@ -1,0 +1,14 @@
+{
+  "endpoints": [
+    "127.0.0.2:24443",
+    "127.0.0.3:24443"
+  ],
+  "protected_ips": [
+    "127.0.0.1"
+  ],
+  "ca_file": "ca.pem",
+  "cert_file": "client.pem",
+  "key_file": "client.key",
+  "node_spki_sha256": "ef599c67bd669d7b90bf00e7a41d6b3507be33ee644d6d9194079bd55831383d",
+  "timeout_ms": 1200
+}

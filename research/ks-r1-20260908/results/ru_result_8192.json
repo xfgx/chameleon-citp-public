@@ -1,0 +1,99 @@
+{
+  "n_fields": 32,
+  "burn": 2048,
+  "measure": 8192,
+  "variants": 7,
+  "determinant_identity_max_error_bits": 7.105427357601002e-15,
+  "qr_sum_max_error_bits": 2.6645352591003757e-14,
+  "all8_control_shift_error_bits": 3.093943554688394e-07,
+  "summary": [
+    {
+      "variant": "free",
+      "fields": 32,
+      "lambda_min": 0.6149207817973461,
+      "lambda_median": 0.7140652348897829,
+      "lambda_max": 0.8600902331956207,
+      "rms_median": 0.3973532274296973,
+      "rms_max": 0.4346412907252614,
+      "stable": 0,
+      "sum_positive": 32
+    },
+    {
+      "variant": "fixed1_095",
+      "fields": 32,
+      "lambda_min": 0.6110106079446255,
+      "lambda_median": 0.7063791951454919,
+      "lambda_max": 0.8600629883594243,
+      "rms_median": 0.3668909139349993,
+      "rms_max": 0.4069020398393263,
+      "stable": 0,
+      "sum_positive": 31
+    },
+    {
+      "variant": "rotate1_095",
+      "fields": 32,
+      "lambda_min": 0.14094349206047474,
+      "lambda_median": 0.19475722982269938,
+      "lambda_max": 0.32256615786716614,
+      "rms_median": 0.21126257115312463,
+      "rms_max": 0.25407759444269234,
+      "stable": 0,
+      "sum_positive": 31
+    },
+    {
+      "variant": "rotate1_0999",
+      "fields": 32,
+      "lambda_min": -0.40577178581332995,
+      "lambda_median": -0.0012747211065392487,
+      "lambda_max": 0.08571357393606002,
+      "rms_median": 0.002019628522453236,
+      "rms_max": 0.10942959651171863,
+      "stable": 16,
+      "sum_positive": 0
+    },
+    {
+      "variant": "fixed4_095",
+      "fields": 32,
+      "lambda_min": 0.5726425628163612,
+      "lambda_median": 0.6725242021601394,
+      "lambda_max": 0.8565737493717871,
+      "rms_median": 0.2738768436391575,
+      "rms_max": 0.30903185572885494,
+      "stable": 0,
+      "sum_positive": 0
+    },
+    {
+      "variant": "alternate4_095",
+      "fields": 32,
+      "lambda_min": -1.4800503906172593,
+      "lambda_median": -1.412773569842447,
+      "lambda_max": -1.2945420384067643,
+      "rms_median": 0.0,
+      "rms_max": 0.0,
+      "stable": 32,
+      "sum_positive": 0
+    },
+    {
+      "variant": "all8_075_control",
+      "fields": 32,
+      "lambda_min": -1.3850792182026563,
+      "lambda_median": -1.2859347651306048,
+      "lambda_max": -1.1399097668043754,
+      "rms_median": 0.0,
+      "rms_max": 0.0,
+      "stable": 32,
+      "sum_positive": 0
+    }
+  ],
+  "controls": {
+    "signed_multiplication_cases": 10000,
+    "rfc8439_2_8_2": "PASS",
+    "uncoupled_mu4_lambda_bits": 1.0000613441054604,
+    "uncoupled_mu4_samples": 17952
+  },
+  "host": "your-node.example.com",
+  "python": "3.12.3",
+  "numpy": "1.26.4",
+  "elapsed_s": 123.09492588043213,
+  "script_sha256": "8a7866f3548c3c46ba91996b7ff3a9086b5fb0e7006a24af8b3a2cd7cefe6305"
+}

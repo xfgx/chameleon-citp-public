@@ -1,0 +1,16 @@
+{
+  "binary_sha256": "64249521c5f07f330f1be3cb40b91b6032cfc18c625a8364233d444294026da5",
+  "mcp_source_sha256": "1c70557dff5f07d379fdc8f89c7b2d747a8e7bdf25e1a998868d595b4e3dbc10",
+  "ru_source_sha256": "1c70557dff5f07d379fdc8f89c7b2d747a8e7bdf25e1a998868d595b4e3dbc10",
+  "client_exit": 0,
+  "server_exit": 0,
+  "listener_closed": true,
+  "production_snapshot_unchanged": true,
+  "management_channel_carried_payload": false,
+  "compilation_host": "RU only",
+  "transport": "MCP to RU; TCP laboratory framing of KS datagrams; no production UDP claim",
+  "raw_sha256": {
+    "mcp-raw.jsonl": "a3041ce068367a0b8659ca6a5dec58f143a293ec92725a089e8029bd2829ab52",
+    "ru-raw.jsonl": "d642724363827863028f2556177e33785ff2a4fa491fe2bac0de82a3168add1e"
+  }
+}

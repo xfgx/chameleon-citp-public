@@ -1,0 +1,6 @@
+{
+  "stage": "FAILED",
+  "time_unix": 1788880742.3273354,
+  "error_type": "RuntimeError",
+  "detail": "RU phase failed: unit.log"
+}

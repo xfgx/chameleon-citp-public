@@ -1,0 +1,4 @@
+
+### 2026-09-01T13:05Z — Архив Windows-клиента на RU-ноде
+
+- `/root/dist/cdt-windows-client-20260901.tar.gz` (7 661 829 Б, sha256 `65b69027dc12f289e9b6a5a17f2f24745383828610958be787472725aa588418`). Состав: `cdt-socks-windows-amd64.exe`, `cdt-probe-windows-amd64.exe`, `chaossync-client-windows-amd64.exe`, `chaossync-selftest-windows-amd64.exe` (все из dist/cdt-chaos-20260901, сборка на RU-ноде), `data/cdt.key` + `data/chaossync.key` (живые ключи сервисов; копировались на ноде без чтения/печати содержимого, 0600), `client.conf` под живую ноду (192.0.2.10:4500, T=8 c=0.85 rate=1000 S=32 batch=4, dur=60s, send=probe-from-windows), `README.txt` (быстрый старт, -geomauto, самотест с золотым хэшем Э1), `run-cdt-socks.bat`, `run-chaossync.bat`, `SHA256SUMS`. Стейджинг-директория рядом: `/root/dist/cdt-windows-client-20260901/`. По правилу владельца архив/exe в MCP-контейнер НЕ переносятся — забор с ноды.

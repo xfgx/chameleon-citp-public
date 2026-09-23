@@ -1,0 +1,12 @@
+{
+  "ip route show": "2c4691184b39bd398f4d1ec264ce9b3025622f8d8d3020f5fd0efe988a7d53e8",
+  "ip -6 route show": "515c24ed2204018e3128d091e6f3c3a0de76ef57d86fe0f5989ef02b6f7f4081",
+  "ip rule show": "cd658a0f1c86d1dc9030e46151c04d3681de36812753d738e064d54cadfb3c14",
+  "ip -6 rule show": "d160618a80c39b20c4c1c6b8b02146f9a437ad0260355aba9971a42ea5ca9a96",
+  "nft list ruleset": "57b199af5eb97e4afc8a0122e65b2d7cbb1b205e193bf0029e6d6a0cd505c255",
+  "systemctl show ks-vpn-node ks-vpn-exit ks-vpn-hub ks-vpn-phone ks-admin chaossync-server -p Id -p ActiveState -p MainPID -p NRestarts": "f81ece7a8380dccc408c1695609871dc213d00b4fc980f6ef9c0c0517f099300",
+  "production_ks_source": "1c70557dff5f07d379fdc8f89c7b2d747a8e7bdf25e1a998868d595b4e3dbc10",
+  "production_binary_ks-vpn": "8b1283b71a18db31788c42bd50e787192fd1aa649e9e4291573c617842124942",
+  "production_binary_ks-hub": "e5d257fac1e1ef643f704e86767db962d9b4efe9c1d46b1162b4bf4c1ed0bf99",
+  "production_binary_ks-admin": "620465ae3a37671e8b862098dca2ae417116831c2fa2d3191d1b41c1610ae2a1"
+}

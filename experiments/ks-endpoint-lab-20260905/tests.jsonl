@@ -1,0 +1,100 @@
+{"Time":"2026-09-05T10:58:20.414613303Z","Action":"start","Package":"ks-endpoint-lab"}
+{"Time":"2026-09-05T10:58:20.420092126Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy"}
+{"Time":"2026-09-05T10:58:20.420135633Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy","Output":"=== RUN   TestPolicy\n"}
+{"Time":"2026-09-05T10:58:20.420231687Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/explicit_alias"}
+{"Time":"2026-09-05T10:58:20.420239799Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/explicit_alias","Output":"=== RUN   TestPolicy/explicit_alias\n"}
+{"Time":"2026-09-05T10:58:20.420250492Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/explicit_alias","Output":"--- PASS: TestPolicy/explicit_alias (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420258277Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/explicit_alias","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420266724Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/protected_primary"}
+{"Time":"2026-09-05T10:58:20.420272767Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/protected_primary","Output":"=== RUN   TestPolicy/protected_primary\n"}
+{"Time":"2026-09-05T10:58:20.420282206Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/protected_primary","Output":"--- PASS: TestPolicy/protected_primary (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420289109Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/protected_primary","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420295996Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_protected"}
+{"Time":"2026-09-05T10:58:20.420301943Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_protected","Output":"=== RUN   TestPolicy/mapped_protected\n"}
+{"Time":"2026-09-05T10:58:20.420309377Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_protected","Output":"--- PASS: TestPolicy/mapped_protected (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420316224Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_protected","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420322948Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_deny"}
+{"Time":"2026-09-05T10:58:20.420331623Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_deny","Output":"=== RUN   TestPolicy/mapped_deny\n"}
+{"Time":"2026-09-05T10:58:20.420350985Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_deny","Output":"--- PASS: TestPolicy/mapped_deny (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420359269Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/mapped_deny","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420366136Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/no_dns"}
+{"Time":"2026-09-05T10:58:20.420372369Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_dns","Output":"=== RUN   TestPolicy/no_dns\n"}
+{"Time":"2026-09-05T10:58:20.420386846Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_dns","Output":"--- PASS: TestPolicy/no_dns (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420394193Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/no_dns","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420414964Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/no_wildcard"}
+{"Time":"2026-09-05T10:58:20.420423564Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_wildcard","Output":"=== RUN   TestPolicy/no_wildcard\n"}
+{"Time":"2026-09-05T10:58:20.420431508Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_wildcard","Output":"--- PASS: TestPolicy/no_wildcard (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420438488Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/no_wildcard","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420451707Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/no_multicast"}
+{"Time":"2026-09-05T10:58:20.420458002Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_multicast","Output":"=== RUN   TestPolicy/no_multicast\n"}
+{"Time":"2026-09-05T10:58:20.420494707Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_multicast","Output":"--- PASS: TestPolicy/no_multicast (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420503947Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/no_multicast","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420510828Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/no_empty_pool"}
+{"Time":"2026-09-05T10:58:20.420534584Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_empty_pool","Output":"=== RUN   TestPolicy/no_empty_pool\n"}
+{"Time":"2026-09-05T10:58:20.420561035Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_empty_pool","Output":"--- PASS: TestPolicy/no_empty_pool (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420569556Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/no_empty_pool","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420576512Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestPolicy/no_duplicates"}
+{"Time":"2026-09-05T10:58:20.420582621Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_duplicates","Output":"=== RUN   TestPolicy/no_duplicates\n"}
+{"Time":"2026-09-05T10:58:20.420590324Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy/no_duplicates","Output":"--- PASS: TestPolicy/no_duplicates (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420597221Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy/no_duplicates","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420604488Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestPolicy","Output":"--- PASS: TestPolicy (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420611815Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestPolicy","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420618474Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestFraming"}
+{"Time":"2026-09-05T10:58:20.4206245Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestFraming","Output":"=== RUN   TestFraming\n"}
+{"Time":"2026-09-05T10:58:20.420631941Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestFraming","Output":"--- PASS: TestFraming (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.420638905Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestFraming","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.420645841Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover"}
+{"Time":"2026-09-05T10:58:20.420651928Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"=== RUN   TestRealSocketsFailover\n"}
+{"Time":"2026-09-05T10:58:20.423341877Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"fixture_created\",\"detail\":\"one-day lab credentials only; CA private key not saved\",\"time\":\"2026-09-05T10:58:20.423289158Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.424751681Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"ready\",\"detail\":\"2 exact-IP listeners\",\"time\":\"2026-09-05T10:58:20.424671195Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.435094128Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"client_auth_failed\",\"endpoint\":\"127.0.0.2:36547\",\"time\":\"2026-09-05T10:58:20.434883201Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.435143544Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.2:36547\",\"time\":\"2026-09-05T10:58:20.435082973Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.437575681Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"connected\",\"endpoint\":\"127.0.0.2:36547\",\"detail\":\"TLS1.3, verified node key\",\"time\":\"2026-09-05T10:58:20.437458544Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.438214443Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"echo\",\"endpoint\":\"127.0.0.2:36547\",\"sequence\":1,\"time\":\"2026-09-05T10:58:20.438176639Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.438502784Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"echo\",\"endpoint\":\"127.0.0.2:36547\",\"sequence\":2,\"time\":\"2026-09-05T10:58:20.438410681Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.438601427Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"fault_listener_closed\",\"endpoint\":\"127.0.0.2:36547\",\"detail\":\"test fault; not an ISP block\",\"time\":\"2026-09-05T10:58:20.438464196Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.439263677Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.3:36547\",\"time\":\"2026-09-05T10:58:20.438812146Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.441619042Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"connected\",\"endpoint\":\"127.0.0.3:36547\",\"detail\":\"TLS1.3, verified node key\",\"time\":\"2026-09-05T10:58:20.441010003Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.441889697Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"echo\",\"endpoint\":\"127.0.0.3:36547\",\"sequence\":3,\"time\":\"2026-09-05T10:58:20.441733882Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.441962699Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"{\"event\":\"server_stopped\",\"sequence\":3,\"time\":\"2026-09-05T10:58:20.441917871Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.442596443Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Output":"--- PASS: TestRealSocketsFailover (0.02s)\n"}
+{"Time":"2026-09-05T10:58:20.442727531Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestRealSocketsFailover","Elapsed":0.02}
+{"Time":"2026-09-05T10:58:20.442752821Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient"}
+{"Time":"2026-09-05T10:58:20.442760133Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"=== RUN   TestWrongIdentityAndClient\n"}
+{"Time":"2026-09-05T10:58:20.448590716Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"fixture_created\",\"detail\":\"one-day lab credentials only; CA private key not saved\",\"time\":\"2026-09-05T10:58:20.448496754Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.449424467Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"ready\",\"detail\":\"2 exact-IP listeners\",\"time\":\"2026-09-05T10:58:20.449329054Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.459644736Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"client_auth_failed\",\"endpoint\":\"127.0.0.2:46507\",\"time\":\"2026-09-05T10:58:20.45946738Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.459740178Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.2:46507\",\"time\":\"2026-09-05T10:58:20.459709133Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.461505632Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"authentication_failed\",\"endpoint\":\"127.0.0.2:46507\",\"detail\":\"wrong node identity\",\"time\":\"2026-09-05T10:58:20.461332123Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.461587959Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.3:46507\",\"time\":\"2026-09-05T10:58:20.461348873Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.461599588Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"client_auth_failed\",\"endpoint\":\"127.0.0.2:46507\",\"time\":\"2026-09-05T10:58:20.461364574Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.463042476Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"authentication_failed\",\"endpoint\":\"127.0.0.3:46507\",\"detail\":\"wrong node identity\",\"time\":\"2026-09-05T10:58:20.462930176Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.463084607Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"client_auth_failed\",\"endpoint\":\"127.0.0.3:46507\",\"time\":\"2026-09-05T10:58:20.462951185Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.465285945Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"fixture_created\",\"detail\":\"one-day lab credentials only; CA private key not saved\",\"time\":\"2026-09-05T10:58:20.46521274Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.465557178Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.2:46507\",\"time\":\"2026-09-05T10:58:20.465493452Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.467505401Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"connected\",\"endpoint\":\"127.0.0.2:46507\",\"detail\":\"TLS1.3, verified node key\",\"time\":\"2026-09-05T10:58:20.467445686Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.468715384Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"client_auth_failed\",\"endpoint\":\"127.0.0.2:46507\",\"time\":\"2026-09-05T10:58:20.467825909Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.468759793Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"{\"event\":\"server_stopped\",\"time\":\"2026-09-05T10:58:20.467984772Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.469036656Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Output":"--- PASS: TestWrongIdentityAndClient (0.03s)\n"}
+{"Time":"2026-09-05T10:58:20.469065033Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestWrongIdentityAndClient","Elapsed":0.03}
+{"Time":"2026-09-05T10:58:20.469084197Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery"}
+{"Time":"2026-09-05T10:58:20.469096861Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"=== RUN   TestAllDownAndNoDiscovery\n"}
+{"Time":"2026-09-05T10:58:20.471028493Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"{\"event\":\"fixture_created\",\"detail\":\"one-day lab credentials only; CA private key not saved\",\"time\":\"2026-09-05T10:58:20.470973245Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.471421964Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.2:33171\",\"time\":\"2026-09-05T10:58:20.471379381Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.471662674Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"{\"event\":\"dial_failed\",\"endpoint\":\"127.0.0.2:33171\",\"detail\":\"dial tcp 127.0.0.2:33171: connect: connection refused\",\"time\":\"2026-09-05T10:58:20.47162208Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.471681604Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"{\"event\":\"dial\",\"endpoint\":\"127.0.0.3:33171\",\"time\":\"2026-09-05T10:58:20.471640017Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.472377007Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"{\"event\":\"dial_failed\",\"endpoint\":\"127.0.0.3:33171\",\"detail\":\"dial tcp 127.0.0.3:33171: connect: connection refused\",\"time\":\"2026-09-05T10:58:20.471829615Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.472398452Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Output":"--- PASS: TestAllDownAndNoDiscovery (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.472407388Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestAllDownAndNoDiscovery","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.472422136Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestFixtureNeverOverwrites"}
+{"Time":"2026-09-05T10:58:20.472449254Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestFixtureNeverOverwrites","Output":"=== RUN   TestFixtureNeverOverwrites\n"}
+{"Time":"2026-09-05T10:58:20.472819463Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestFixtureNeverOverwrites","Output":"--- PASS: TestFixtureNeverOverwrites (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.472843818Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestFixtureNeverOverwrites","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.472852585Z","Action":"run","Package":"ks-endpoint-lab","Test":"TestInvalidFrameDoesNotDial"}
+{"Time":"2026-09-05T10:58:20.472858651Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestInvalidFrameDoesNotDial","Output":"=== RUN   TestInvalidFrameDoesNotDial\n"}
+{"Time":"2026-09-05T10:58:20.474861094Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestInvalidFrameDoesNotDial","Output":"{\"event\":\"fixture_created\",\"detail\":\"one-day lab credentials only; CA private key not saved\",\"time\":\"2026-09-05T10:58:20.474816566Z\"}\n"}
+{"Time":"2026-09-05T10:58:20.475691897Z","Action":"output","Package":"ks-endpoint-lab","Test":"TestInvalidFrameDoesNotDial","Output":"--- PASS: TestInvalidFrameDoesNotDial (0.00s)\n"}
+{"Time":"2026-09-05T10:58:20.475720157Z","Action":"pass","Package":"ks-endpoint-lab","Test":"TestInvalidFrameDoesNotDial","Elapsed":0}
+{"Time":"2026-09-05T10:58:20.475729002Z","Action":"output","Package":"ks-endpoint-lab","Output":"PASS\n"}
+{"Time":"2026-09-05T10:58:20.476304094Z","Action":"output","Package":"ks-endpoint-lab","Output":"ok  \tks-endpoint-lab\t0.061s\n"}
+{"Time":"2026-09-05T10:58:20.476326672Z","Action":"pass","Package":"ks-endpoint-lab","Elapsed":0.062}

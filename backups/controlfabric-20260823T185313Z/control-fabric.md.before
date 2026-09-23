@@ -1,0 +1,72 @@
+# CITP Control Fabric (Experimental)
+
+Status: **architecture and safe stubs only**. The normal VPN data plane remains
+unchanged. This layer is for low-bandwidth control hints: bootstrap, next-hop
+selection, profile rotation and emergency fallback.
+
+## Channels
+
+### 1. CAR — Censor-as-Relay / Censor-as-Modulator
+
+CAR treats a deterministic on-path blocking reaction as a noisy binary oracle:
+a probe either reaches a cooperating observer or it is interrupted by the
+network. CITP uses this only as a control-channel concept, not as a bulk data
+transport.
+
+Safety rules:
+- CAR must never rely on third-party abuse or reflection.
+- Probes are rate-limited and bounded.
+- The channel carries only authenticated, replay-protected control envelopes.
+- If the oracle is unstable, the channel disables itself.
+
+Expected bandwidth: **very low**; suitable for bits/seconds to tens of bits/s in
+friendly lab conditions, not for VPN payload.
+
+### 2. BGP control-plane channel
+
+A BGP-backed channel can only be operated by networks that legitimately control
+prefixes and routing policy. CITP represents it as a read-only/low-rate control
+source. The implementation must not flap public routes automatically without an
+operator-approved lab or private routing environment.
+
+Safety rules:
+- No automatic public BGP announce/withdraw loop is implemented here.
+- Use only private lab BGP or explicitly authorized infrastructure.
+- Apply strong rate limits and damping-aware scheduling.
+
+Expected bandwidth: **sub-bit/s to a few bit/s** with high latency.
+
+### 3. Anycast/CDN cache-state board
+
+A cache-state board is a rendezvous/control abstraction where both sides observe
+an externally hosted state, such as edge identity or cache metadata. CITP treats
+this as a noisy mailbox, not a data plane.
+
+Safety rules:
+- No unauthorized cache invalidation or third-party service abuse.
+- Prefer infrastructure the operator owns or is permitted to test.
+- Payload is never stored in clear; only authenticated control envelopes.
+
+Expected bandwidth: low; useful for bootstrap and failover.
+
+## Control envelope
+
+Every channel transports the same encrypted control envelope:
+
+```text
+version | channel_id | epoch | seq | command | payload | auth_tag
+```
+
+Commands are deliberately small:
+- `NOOP`
+- `ROTATE_PROFILE`
+- `FETCH_NODE_DIRECTORY`
+- `SWITCH_CARRIER`
+- `OPEN_FLOWLET`
+- `RESUME_SESSION`
+- `EMERGENCY_MAILBOX`
+
+## Integration
+
+`internal/chameleon/control_fabric.go` defines the shared interface and safe
+no-op stubs. Real deployments must plug in explicitly authorized backends.

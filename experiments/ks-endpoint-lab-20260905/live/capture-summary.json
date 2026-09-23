@@ -1,0 +1,27 @@
+{
+  "alias-ru.pcap": {
+    "tcp_packets": 0,
+    "pairs": {}
+  },
+  "primary-control-ru.pcap": {
+    "tcp_packets": 62,
+    "pairs": {
+      "198.51.100.10 -> 192.0.2.10": 32,
+      "192.0.2.10 -> 198.51.100.10": 30
+    }
+  },
+  "mcp-test-traffic.pcap": {
+    "tcp_packets": 116,
+    "pairs": {
+      "172.18.0.2 -> 192.0.2.11": 21,
+      "192.0.2.11 -> 172.18.0.2": 12,
+      "172.18.0.2 -> 192.0.2.10": 43,
+      "192.0.2.10 -> 172.18.0.2": 40
+    }
+  },
+  "strict_alias_phase": {
+    "tcp_packets": 33,
+    "primary_ip_packets": 0,
+    "alias_ip_packets": 33
+  }
+}

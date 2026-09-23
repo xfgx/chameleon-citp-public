@@ -1,0 +1,1 @@
+Мы переписали планировщик и убрали два лишних обхода очереди, потому что профиль показал деградацию на горячем пути. The new scheduler keeps a single ready queue per core and steals work only when the local queue is empty, which removed the two redundant scans we saw in the profiler.

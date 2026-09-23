@@ -1,0 +1,187 @@
+{
+  "scope": "isolated routed IPv6 on RU, NOT MCP-to-RU Internet",
+  "clock": "injected epochs 100 and 101, not a wall-clock rotation daemon",
+  "cases": [
+    {
+      "case": "initial",
+      "requested": 3,
+      "application_probes": 3,
+      "successful": 3,
+      "expected": 3,
+      "returncode": 0,
+      "dialed": [
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443"
+      ],
+      "connected": [
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443"
+      ],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "current_ip_blocked",
+      "requested": 3,
+      "application_probes": 3,
+      "successful": 3,
+      "expected": 3,
+      "returncode": 0,
+      "dialed": [
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443",
+        "[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443"
+      ],
+      "connected": [
+        "[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443"
+      ],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "next_epoch_new_address",
+      "requested": 3,
+      "application_probes": 3,
+      "successful": 3,
+      "expected": 3,
+      "returncode": 0,
+      "dialed": [
+        "[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443"
+      ],
+      "connected": [
+        "[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443"
+      ],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "expired_window",
+      "requested": 1,
+      "application_probes": 1,
+      "successful": 0,
+      "expected": 0,
+      "returncode": 2,
+      "dialed": [
+        "[2001:db8:300:0:32f1:ea8b:e7ea:73cd]:24443",
+        "[2001:db8:300:0:3b2f:8258:2cc7:23ba]:24443",
+        "[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443"
+      ],
+      "connected": [],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "wrong_hop_key",
+      "requested": 1,
+      "application_probes": 1,
+      "successful": 0,
+      "expected": 0,
+      "returncode": 2,
+      "dialed": [
+        "[2001:db8:300:0:7da2:91f7:c5af:d915]:24443",
+        "[2001:db8:300:0:5217:4d3f:18f1:4c15]:24443",
+        "[2001:db8:300:0:d08:f947:330b:e328]:24443"
+      ],
+      "connected": [],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "wrong_node_identity",
+      "requested": 1,
+      "application_probes": 1,
+      "successful": 0,
+      "expected": 0,
+      "returncode": 2,
+      "dialed": [
+        "[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443",
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443",
+        "[2001:db8:300:0:198e:5b25:680:acd]:24443"
+      ],
+      "connected": [],
+      "authentication_rejections": 2,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "protected_primary_config",
+      "requested": 1,
+      "application_probes": 0,
+      "successful": 0,
+      "expected": 0,
+      "returncode": 2,
+      "dialed": [],
+      "connected": [],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    },
+    {
+      "case": "entire_prefix_blocked",
+      "requested": 1,
+      "application_probes": 1,
+      "successful": 0,
+      "expected": 0,
+      "returncode": 2,
+      "dialed": [
+        "[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443",
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443",
+        "[2001:db8:300:0:198e:5b25:680:acd]:24443"
+      ],
+      "connected": [],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": true
+    }
+  ],
+  "link_local_setup_ready": true,
+  "independent_plans_match": true,
+  "plans": {
+    "epoch100": {
+      "epoch": 100,
+      "endpoints": [
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443",
+        "[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443",
+        "[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443"
+      ],
+      "network_action": "none: computation only"
+    },
+    "epoch101": {
+      "epoch": 101,
+      "endpoints": [
+        "[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443",
+        "[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443",
+        "[2001:db8:300:0:198e:5b25:680:acd]:24443"
+      ],
+      "network_action": "none: computation only"
+    }
+  },
+  "router_filters": "table ip6 rv_filter {\n\tchain forward {\n\t\ttype filter hook forward priority filter; policy accept;\n\t\tip6 daddr 2001:db8:300::/64 counter packets 6 bytes 480 drop\n\t\tip6 daddr 2001:db8:300:0:7345:dd12:8ac0:ae81 counter packets 4 bytes 320 drop\n\t\tip6 daddr 2001:db8:300::/64 ip6 daddr != { 2001:db8:300:0:1988:d6d8:4dc0:c2bc, 2001:db8:300:0:198e:5b25:680:acd, 2001:db8:300:0:6d98:eeb7:614b:a58f, 2001:db8:300:0:7345:dd12:8ac0:ae81 } drop\n\t}\n}\n",
+  "capture": {
+    "ipv6_packets": 139,
+    "tcp_packets": 135,
+    "protected_primary_packets": 0,
+    "scope": "all IPv6 on the isolated client-router link",
+    "sha256": "4cd4f7c88a9edf9444cf16b24d535f459dea341174c79ef866fa4724b24bc6b1",
+    "seen_addresses": [
+      "2001:db8:100::1",
+      "2001:db8:100::2",
+      "2001:db8:300:0:1988:d6d8:4dc0:c2bc",
+      "2001:db8:300:0:198e:5b25:680:acd",
+      "2001:db8:300:0:32f1:ea8b:e7ea:73cd",
+      "2001:db8:300:0:3b2f:8258:2cc7:23ba",
+      "2001:db8:300:0:5217:4d3f:18f1:4c15",
+      "2001:db8:300:0:6d98:eeb7:614b:a58f",
+      "2001:db8:300:0:7345:dd12:8ac0:ae81",
+      "2001:db8:300:0:7da2:91f7:c5af:d915",
+      "2001:db8:300:0:d08:f947:330b:e328",
+      "fe80::34ac:e8ff:fed3:7ee8",
+      "ff02::1:ff00:1",
+      "ff02::2"
+    ]
+  },
+  "overall_pass": true,
+  "private_keys_removed": true
+}

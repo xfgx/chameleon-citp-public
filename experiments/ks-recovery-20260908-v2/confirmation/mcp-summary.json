@@ -1,0 +1,267 @@
+{
+  "elapsed_ms": 8157,
+  "ks_bytes_sent": 3255352,
+  "remote": {
+    "burst-boundary": {
+      "checkpoint-reset": {
+        "gen": 16543,
+        "high": 8351,
+        "max_slots": 8319,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 16543
+      },
+      "checkpoint-retain": {
+        "gen": 16543,
+        "high": 8351,
+        "max_slots": 8255,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 16543
+      },
+      "frontier": {
+        "gen": 16543,
+        "high": 8351,
+        "max_slots": 8319,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 16543
+      },
+      "legacy-16384": {
+        "gen": 16543,
+        "high": 0,
+        "max_slots": 16383,
+        "restores": 0,
+        "slots": 16383,
+        "steps": 16543
+      },
+      "legacy-8192": {
+        "gen": 8351,
+        "high": 0,
+        "max_slots": 8191,
+        "restores": 0,
+        "slots": 8191,
+        "steps": 8351
+      }
+    },
+    "corruption-replay": {
+      "checkpoint-reset": {
+        "gen": 8193,
+        "high": 1,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8193
+      },
+      "checkpoint-retain": {
+        "gen": 8193,
+        "high": 1,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8193
+      },
+      "frontier": {
+        "gen": 8193,
+        "high": 1,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8193
+      },
+      "legacy-16384": {
+        "gen": 16385,
+        "high": 0,
+        "max_slots": 16384,
+        "restores": 0,
+        "slots": 16384,
+        "steps": 16385
+      },
+      "legacy-8192": {
+        "gen": 8193,
+        "high": 0,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8193
+      }
+    },
+    "cumulative-loss": {
+      "checkpoint-reset": {
+        "gen": 48192,
+        "high": 40000,
+        "max_slots": 8256,
+        "restores": 0,
+        "slots": 8256,
+        "steps": 48192
+      },
+      "checkpoint-retain": {
+        "gen": 48192,
+        "high": 40000,
+        "max_slots": 8224,
+        "restores": 0,
+        "slots": 8224,
+        "steps": 48192
+      },
+      "frontier": {
+        "gen": 48192,
+        "high": 40000,
+        "max_slots": 8256,
+        "restores": 0,
+        "slots": 8256,
+        "steps": 48192
+      },
+      "legacy-16384": {
+        "gen": 32767,
+        "high": 0,
+        "max_slots": 16384,
+        "restores": 0,
+        "slots": 16384,
+        "steps": 32767
+      },
+      "legacy-8192": {
+        "gen": 16383,
+        "high": 0,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 16383
+      }
+    },
+    "event_count": 20881,
+    "long-gap": {
+      "checkpoint-reset": {
+        "gen": 41152,
+        "high": 32960,
+        "max_slots": 8224,
+        "restores": 1,
+        "slots": 8192,
+        "steps": 16576
+      },
+      "checkpoint-retain": {
+        "gen": 41152,
+        "high": 32960,
+        "max_slots": 8224,
+        "restores": 1,
+        "slots": 8192,
+        "steps": 16576
+      },
+      "frontier": {
+        "gen": 8256,
+        "high": 64,
+        "max_slots": 8224,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8256
+      },
+      "legacy-16384": {
+        "gen": 16448,
+        "high": 0,
+        "max_slots": 16384,
+        "restores": 0,
+        "slots": 16384,
+        "steps": 16448
+      },
+      "legacy-8192": {
+        "gen": 8256,
+        "high": 0,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8256
+      }
+    },
+    "long-gap-no-checkpoint": {
+      "checkpoint-reset": {
+        "gen": 8256,
+        "high": 64,
+        "max_slots": 8224,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8256
+      },
+      "checkpoint-retain": {
+        "gen": 8256,
+        "high": 64,
+        "max_slots": 8224,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8256
+      },
+      "frontier": {
+        "gen": 8256,
+        "high": 64,
+        "max_slots": 8224,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8256
+      },
+      "legacy-16384": {
+        "gen": 16448,
+        "high": 0,
+        "max_slots": 16384,
+        "restores": 0,
+        "slots": 16384,
+        "steps": 16448
+      },
+      "legacy-8192": {
+        "gen": 8256,
+        "high": 0,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8256
+      }
+    },
+    "no-loss": {
+      "checkpoint-reset": {
+        "gen": 8448,
+        "high": 256,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8448
+      },
+      "checkpoint-retain": {
+        "gen": 8448,
+        "high": 256,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8448
+      },
+      "frontier": {
+        "gen": 8448,
+        "high": 256,
+        "max_slots": 8192,
+        "restores": 0,
+        "slots": 8192,
+        "steps": 8448
+      },
+      "legacy-16384": {
+        "gen": 16639,
+        "high": 0,
+        "max_slots": 16383,
+        "restores": 0,
+        "slots": 16383,
+        "steps": 16639
+      },
+      "legacy-8192": {
+        "gen": 8447,
+        "high": 0,
+        "max_slots": 8191,
+        "restores": 0,
+        "slots": 8191,
+        "steps": 8447
+      }
+    },
+    "source_restart_characterization": {
+      "initial_packet_accepted": true,
+      "new_instance_accepts_old_packet": true,
+      "same_epoch_restart_repeats_nonce": true,
+      "same_instance_replay_rejected": true
+    }
+  },
+  "source_payloads": 114528,
+  "transport": "dedicated TCP carrying original KS datagrams; controlled sender omissions; not production UDP"
+}

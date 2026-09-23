@@ -1,0 +1,224 @@
+{
+  "method": "independent raw client/server reconciliation and powerset recoverability check; no new transmissions",
+  "no_payload_reuse_across_runs": true,
+  "runs": [
+    {
+      "certificate_json_bytes_min_max": [
+        46,
+        61
+      ],
+      "certificate_optimum_matches_including_two_witnesses": 376,
+      "client_records": 380,
+      "decoded_hash_checks": 5105,
+      "descriptor_raw_bits_smaller_equal_larger": [
+        187,
+        0,
+        187
+      ],
+      "directory": "/files/VPN/experiments/fec-r2-20260906-v1",
+      "distinct_ranked_descriptors": 369,
+      "distinct_rankless_descriptors": 353,
+      "fresh_unique_source_symbols": 1900,
+      "listener_closed": true,
+      "mcp_raw_sha256": "ca3b78ef538dfe8a81247a35482659ad13e85ddcc1cec1ce7a087a59f08657ed",
+      "rank_distribution": {
+        "0": 1,
+        "1": 31,
+        "2": 155,
+        "3": 155,
+        "4": 31,
+        "5": 1
+      },
+      "representative_greedy_difference": {
+        "actions": {
+          "certificate": [
+            2,
+            3
+          ],
+          "greedy": [
+            1,
+            2
+          ],
+          "recommendation": [
+            2,
+            3
+          ]
+        },
+        "basis": [
+          1,
+          28
+        ],
+        "case": "space_045",
+        "certificate": {
+          "labels": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "rank": 2,
+          "triangles": [
+            [
+              2,
+              3,
+              4
+            ]
+          ]
+        },
+        "certificate_json_bytes": 53,
+        "dense_basis_coefficient_bits_excluding_rank_and_framing": 10,
+        "descriptor_raw_bits_excluding_rank_and_framing": 19,
+        "feedback_before_weights": true,
+        "oracle_score": 14,
+        "recovered": {
+          "certificate": [
+            0,
+            2,
+            3,
+            4
+          ],
+          "greedy": [
+            0,
+            1,
+            2
+          ],
+          "recommendation": [
+            0,
+            2,
+            3,
+            4
+          ]
+        },
+        "scores": {
+          "certificate": 14,
+          "greedy": 12,
+          "recommendation": 14
+        },
+        "weights": [
+          4,
+          4,
+          4,
+          2,
+          4
+        ]
+      },
+      "ru_raw_sha256": "e5d32fe23aa71dc173259fa00b98a0467baa5d4130a6f2ec483dd325d052260e",
+      "server_records": 757,
+      "state_snapshot_unchanged": true,
+      "strictly_beats_greedy": 1,
+      "strictly_beats_old_recommendation": 84,
+      "unique_states": 374,
+      "verified": true
+    },
+    {
+      "certificate_json_bytes_min_max": [
+        46,
+        61
+      ],
+      "certificate_optimum_matches_including_two_witnesses": 376,
+      "client_records": 380,
+      "decoded_hash_checks": 5087,
+      "descriptor_raw_bits_smaller_equal_larger": [
+        187,
+        0,
+        187
+      ],
+      "directory": "/files/VPN/experiments/fec-r2-20260906-v1-confirmation",
+      "distinct_ranked_descriptors": 369,
+      "distinct_rankless_descriptors": 353,
+      "fresh_unique_source_symbols": 1900,
+      "listener_closed": true,
+      "mcp_raw_sha256": "45532d62a416e0c2c2bf45ff8571da568e5acc3ada641421eef3f293a2d6f22f",
+      "rank_distribution": {
+        "0": 1,
+        "1": 31,
+        "2": 155,
+        "3": 155,
+        "4": 31,
+        "5": 1
+      },
+      "representative_greedy_difference": {
+        "actions": {
+          "certificate": [
+            1,
+            2
+          ],
+          "greedy": [
+            0,
+            1
+          ],
+          "recommendation": [
+            1,
+            2
+          ]
+        },
+        "basis": [
+          8,
+          22
+        ],
+        "case": "space_129",
+        "certificate": {
+          "labels": [
+            1,
+            2,
+            3,
+            0,
+            4
+          ],
+          "rank": 2,
+          "triangles": [
+            [
+              2,
+              3,
+              4
+            ]
+          ]
+        },
+        "certificate_json_bytes": 53,
+        "dense_basis_coefficient_bits_excluding_rank_and_framing": 10,
+        "descriptor_raw_bits_excluding_rank_and_framing": 19,
+        "feedback_before_weights": true,
+        "oracle_score": 13,
+        "recovered": {
+          "certificate": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "greedy": [
+            0,
+            1,
+            3
+          ],
+          "recommendation": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "scores": {
+          "certificate": 13,
+          "greedy": 12,
+          "recommendation": 13
+        },
+        "weights": [
+          2,
+          2,
+          2,
+          8,
+          1
+        ]
+      },
+      "ru_raw_sha256": "ee5387b6afc3055153ec7a48ac63fc1d2651e8f7dadf0ae2717324934c3d614f",
+      "server_records": 757,
+      "state_snapshot_unchanged": true,
+      "strictly_beats_greedy": 3,
+      "strictly_beats_old_recommendation": 98,
+      "unique_states": 374,
+      "verified": true
+    }
+  ]
+}

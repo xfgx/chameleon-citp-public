@@ -1,0 +1,22 @@
+@V s01 := [0.45, 0.20, 0.35, 0.50, 0.20, 0.15, 0.65, 0.50, 0.15, 0.65, 0.10, 0.10]
+@G norm := 0.90; top := t11−, t12−, t06−; neutral_axes := 2
+@WHY
+  arousal = 0.20 :: спокойная реплика без выраженного напряжения
+  specificity = 0.20 :: общее согласие без уточнений
+  formality = 0.15 :: разговорная частица и неофициальная формулировка
+  agency = 0.15 :: нет приказа или побуждения к действию
+  complexity = 0.10 :: элементарный смысл без понятийной нагрузки
+  novelty = 0.10 :: устойчивая бытовая формулировка
+@BACK
+  Сдержанная разговорная реплика с оттенком уступчивости, без подробностей и призывов к действию.
+@FLAGS
+  TOO_SHORT
+
+CHECK s01 OK :: dims=12 grid=0.05 norm=0.90 top=t11-,t12-,t06- neutral=2 | tie at the top-3 boundary resolved to lowest index
+       t02 arousal      0.20
+       t05 specificity  0.20
+       t06 formality    0.15
+       t09 agency       0.15
+       t11 complexity   0.10
+       t12 novelty      0.10
+USAGE prompt=3928 completion=469 total=4397 reasoning=217

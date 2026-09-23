@@ -1,0 +1,63 @@
+DOCS 10
+id   file                                             norm top3
+b01  docs/KS.md                                       0.92 t05+,t09-,t11+
+b02  docs/CHAOSSYNC.md                                0.98 t11+,t05+,t07+
+b03  docs/CITP-V3-PHANTOM-TTLS.md                     0.96 t05+,t07+,t09-
+b04  docs/ROADMAP-CENSOR-TRANSPORT.md                 0.88 t05+,t08+,t11+
+b05  docs/CHAOS-METRICS.md                            1.02 t05+,t11+,t07+
+b06  docs/NODE_DEPLOYMENT.md                          1.13 t05+,t09+,t07+
+b07  docs/KS-RESEARCH.md                              1.04 t05+,t11+,t09-
+b08  skills/SKILL.md                                  0.90 t09+,t03+,t05+
+b09  skills/references/honest-measurement.md          0.83 t09+,t07+,t03+
+b10  skills/references/open-fronts.md                 0.85 t05+,t11+,t10-
+
+DISTANCE MATRIX (euclidean, 12D)
+       b01   b02   b03   b04   b05   b06   b07   b08   b09   b10
+b01   0.00  0.35  0.12  0.56  0.27  1.04  0.25  0.97  1.16  0.82
+b02   0.35  0.00  0.28  0.49  0.23  1.21  0.40  0.94  1.20  0.75
+b03   0.12  0.28  0.00  0.51  0.23  1.06  0.27  0.95  1.17  0.79
+b04   0.56  0.49  0.51  0.00  0.62  1.03  0.68  0.68  1.02  0.61
+b05   0.27  0.23  0.23  0.62  0.00  1.16  0.22  1.01  1.22  0.81
+b06   1.04  1.21  1.06  1.03  1.16  0.00  1.06  0.80  0.77  0.98
+b07   0.25  0.40  0.27  0.68  0.22  1.06  0.00  1.07  1.20  0.90
+b08   0.97  0.94  0.95  0.68  1.01  0.80  1.07  0.00  0.75  0.53
+b09   1.16  1.20  1.17  1.02  1.22  0.77  1.20  0.75  0.00  0.94
+b10   0.82  0.75  0.79  0.61  0.81  0.98  0.90  0.53  0.94  0.00
+
+CLOSEST PAIRS
+  b01 ~ b03  distance=0.12 cosine=0.992
+  b05 ~ b07  distance=0.22 cosine=0.977
+  b02 ~ b05  distance=0.23 cosine=0.973
+  b03 ~ b05  distance=0.23 cosine=0.974
+FARTHEST PAIRS
+  b05 ~ b09  distance=1.22 cosine=0.136
+  b02 ~ b06  distance=1.21 cosine=0.354
+  b07 ~ b09  distance=1.20 cosine=0.185
+  b02 ~ b09  distance=1.20 cosine=0.131
+
+AXIS PROFILE ACROSS DOCS
+axis             min  mean   max spread
+t01 valence     0.50  0.51  0.55   0.05
+t02 arousal     0.20  0.29  0.45   0.25
+t03 dominance   0.65  0.71  0.85   0.20
+t04 concreteness  0.35  0.54  0.85   0.50
+t05 specificity  0.40  0.86  0.95   0.55
+t06 formality   0.40  0.66  0.80   0.40
+t07 certainty   0.65  0.84  0.90   0.25
+t08 temporality  0.35  0.57  0.85   0.50
+t09 agency      0.10  0.44  0.95   0.85
+t10 subjectivity  0.10  0.20  0.35   0.25
+t11 complexity  0.55  0.85  0.95   0.40
+t12 novelty     0.15  0.61  0.85   0.70
+
+DISTANCE TO CENTROID (higher = more atypical doc)
+  b09  skills/references/honest-measurement.md        0.84
+  b06  docs/NODE_DEPLOYMENT.md                        0.79
+  b08  skills/SKILL.md                                0.62
+  b10  skills/references/open-fronts.md               0.52
+  b07  docs/KS-RESEARCH.md                            0.48
+  b05  docs/CHAOS-METRICS.md                          0.46
+  b02  docs/CHAOSSYNC.md                              0.44
+  b01  docs/KS.md                                     0.39
+  b04  docs/ROADMAP-CENSOR-TRANSPORT.md               0.39
+  b03  docs/CITP-V3-PHANTOM-TTLS.md                   0.38

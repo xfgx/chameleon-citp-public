@@ -1,0 +1,15 @@
+[Unit]
+Description=Chameleon CDT — chaos-dispersed transport node (cdt-socks, experimental)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/build
+ExecStart=/root/build/cdt-socks -node -keyfile /root/build/cdt-vpn.key -c2nbase 20000 -c2ncount 48 -n2cport 23500
+Restart=always
+RestartSec=3
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

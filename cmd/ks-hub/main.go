@@ -1,0 +1,680 @@
+//go:build linux
+
+// ks-hub — многопользовательский KS-хаб: ОДИН UDP-порт, МНОГО клиентов.
+//
+// Зачем: ks-vpn по конструкции ОДНОКЛИЕНТСКИЙ — один мастер-ключ, один
+// lastPeer, один TUN. Чтобы каналом пользовались несколько человек (телефоны
+// и ПК одновременно), нужен демультиплексор на стороне ноды.
+//
+// Почему это возможно БЕЗ правки формата провода: датаграмма headerless
+// (nonce‖ct), но nonce — производная КЛЮЧЕВОГО РАСПИСАНИЯ пользователя
+// (chaossync/ks.go, KeyGen.next), а приёмник держит окно ожидаемых nonce,
+// то есть узнаёт свои датаграммы сам. Хаб перебирает приёмники пользователей
+// и кэширует src-адрес → пользователь: в устойчивом режиме одна проверка на
+// датаграмму. Поэтому УЖЕ выпущенные клиенты (замороженный Windows-v11 и
+// текущий APK) работают с хабом без изменения кода — им меняются только
+// мастер-ключ, внутренний адрес и порт.
+//
+// Мультипоточность честная и без переупорядочивания: приём разложен на W
+// воркеров (у каждого пользователя свой мьютекс приёмника), а запечатывание
+// идёт СТРОГО одним закреплённым воркером на пользователя (индекс от
+// внутреннего адреса) — параллельно по людям, но внутри одного туннеля
+// порядок датаграмм сохранён. chaossync.Sender/Receiver не потокобезопасны,
+// поэтому эта дисциплина — обязательная, а не косметика.
+//
+// Безопасность:
+//   - у каждого пользователя СВОЙ мастер-ключ; отзыв = удалить файл + SIGHUP;
+//   - анти-спуфинг: пакет принимается только с внутреннего адреса владельца,
+//     иначе один пользователь мог бы представиться другим;
+//   - изоляция по умолчанию: клиенты не видят друг друга (-allowpeers=false);
+//   - probe-invisibility сохранена: не прошедшее AEAD молча отбрасывается.
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+	"path/filepath"
+	"runtime"
+	"sort"
+	"strconv"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
+
+	"chameleon/internal/chaossync"
+)
+
+const (
+	hubVersion = "ks-hub/2-v6 (2026-09-18)"
+	hubV6Pool  = "2001:db8:1::/52"
+	slotMin    = 11
+	slotMax    = 250
+	datchCap   = 8192
+	outqCap    = 4096
+)
+
+// счётчики стадий (журнал раз в 2 с + файл состояния)
+var (
+	cTunRead  atomic.Uint64
+	cTunWrite atomic.Uint64
+	cUdpRecv  atomic.Uint64
+	cIngestOK atomic.Uint64
+	cDropped  atomic.Uint64
+	cSpoof    atomic.Uint64
+	cIsolated atomic.Uint64
+	cNoRoute  atomic.Uint64
+	cNoPeer   atomic.Uint64
+	cSent     atomic.Uint64
+	cSendErr  atomic.Uint64
+	cV6Drop   atomic.Uint64
+	cQFull    atomic.Uint64
+)
+
+// user — один пользователь: свой ключ, свой внутренний адрес, своя пара
+// концов keystream и свой выученный проводной адрес.
+type user struct {
+	name  string
+	slot  int
+	inner net.IP
+	v6net  *net.IPNet
+
+	master []byte
+
+	// rx трогают ingest-воркеры (любой) — только под rxMu.
+	rxMu sync.Mutex
+	rx   *chaossync.Receiver
+	// tx трогает ТОЛЬКО закреплённый seal-воркер (slot%nWorkers) — без мьютекса.
+	tx *chaossync.Sender
+
+	peer    atomic.Pointer[net.UDPAddr]
+	lastRx  atomic.Int64
+	pktIn   atomic.Uint64
+	pktOut  atomic.Uint64
+	byteIn  atomic.Uint64
+	byteOut atomic.Uint64
+}
+
+// open — попытка расшифровать датаграмму ключевым расписанием этого
+// пользователя. false = это не он (или шум/повтор).
+func (u *user) open(wire []byte) ([]byte, bool) {
+	u.rxMu.Lock()
+	u.rx.TickEpoch(time.Now())
+	plain, ok := u.rx.Ingest(wire)
+	u.rxMu.Unlock()
+	return plain, ok
+}
+
+// table — неизменяемый снимок состава. Перечитывание по SIGHUP подменяет
+// указатель целиком; состояние уже подключённых пользователей переносится.
+type table struct {
+	users   []*user
+	byInner map[string]*user
+}
+
+type inPkt struct {
+	data []byte
+	src  *net.UDPAddr
+}
+
+type outPkt struct {
+	u    *user
+	data []byte
+}
+
+var (
+	tunDev     tunDevice
+	sock       *net.UDPConn
+	innerNet   *net.IPNet
+	selfInner  net.IP
+	innerBcast net.IP
+	hubV6Net   *net.IPNet
+	allowPeer  bool
+	idleLimit  int64
+	epochT     uint64
+	dirOut     string
+	dirIn      string
+	keyDirPath string
+	maxUsersN  int
+	statusFile string
+	nWorkers   int
+
+	tab      atomic.Pointer[table]
+	srcCache sync.Map
+	datch    chan inPkt
+	outq     []chan outPkt
+	tabMu    sync.Mutex
+)
+
+func main() {
+	keyDir := flag.String("keydir", "/root/build/users", "каталог ключей пользователей: <октет>-<имя>.key, права 0600")
+	tunName := flag.String("tun", "kshub0", "имя TUN-адаптера хаба")
+	inner := flag.String("innerself", "10.99.9.2/24", "внутренний адрес хаба и CIDR общей сети пользователей")
+	listen := flag.Int("listen", 51830, "UDP-порт приёма")
+	rotT := flag.Uint64("T", 8, "период ротации эпох, сек (обязан совпадать с клиентами)")
+	workers := flag.Int("workers", 0, "воркеров на направление (0 = по числу ядер)")
+	idle := flag.Int64("idle", 300, "сек тишины, после которых выученный адрес клиента не используется")
+	maxU := flag.Int("maxusers", 64, "предел числа пользователей (окно приёма ~1-2 МБ на человека)")
+	allow := flag.Bool("allowpeers", false, "разрешить клиентам видеть друг друга внутри туннельной сети")
+	status := flag.String("status", "/run/ks-hub/status.json", "файл состояния для админ-скриптов (пусто = не писать)")
+	outDir := flag.String("outdir", "n2c", "Dir исходящего направления (у клиента это -indir)")
+	inDir := flag.String("indir", "c2n", "Dir входящего направления (у клиента это -outdir)")
+	flag.Parse()
+
+	log.SetPrefix("[ks-hub] ")
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
+	ip, ipnet, err := net.ParseCIDR(*inner)
+	if err != nil {
+		log.Fatalf("fail-closed: -innerself %q: %v", *inner, err)
+	}
+	selfInner = ip.To4()
+	if selfInner == nil {
+		log.Fatal("fail-closed: -innerself должен быть IPv4")
+	}
+	innerNet = ipnet
+	innerBcast = broadcastOf(ipnet)
+	if _, hubV6Net, err = net.ParseCIDR(hubV6Pool); err != nil {
+		log.Fatalf("fail-closed: IPv6 pool %s: %v", hubV6Pool, err)
+	}
+	allowPeer = *allow
+	idleLimit = *idle
+	epochT = *rotT
+	dirOut, dirIn = *outDir, *inDir
+	keyDirPath = *keyDir
+	maxUsersN = *maxU
+	statusFile = *status
+	nWorkers = *workers
+	if nWorkers <= 0 {
+		nWorkers = runtime.NumCPU()
+	}
+	if nWorkers < 1 {
+		nWorkers = 1
+	}
+
+	t, err := loadTable(nil)
+	if err != nil {
+		log.Fatalf("fail-closed: каталог ключей %s: %v", keyDirPath, err)
+	}
+	tab.Store(t)
+
+	dev, ifname, err := openTUN(*tunName, *inner, true)
+	if err != nil {
+		log.Fatalf("fail-closed: TUN: %v", err)
+	}
+	tunDev = dev
+
+	sk, err := net.ListenUDP("udp", &net.UDPAddr{Port: *listen})
+	if err != nil {
+		log.Fatalf("fail-closed: слушатель UDP :%d: %v", *listen, err)
+	}
+	sock = sk
+
+	log.Printf("%s: TUN %s %s, слушаю UDP :%d, воркеров %d, изоляция клиентов %v, эпоха T=%d",
+		hubVersion, ifname, *inner, *listen, nWorkers, !allowPeer, epochT)
+	logTable(t)
+
+	datch = make(chan inPkt, datchCap)
+	outq = make([]chan outPkt, nWorkers)
+	for i := 0; i < nWorkers; i++ {
+		outq[i] = make(chan outPkt, outqCap)
+		go sealWorker(outq[i])
+		go ingestWorker()
+	}
+
+	go udpReader()
+	go statusLoop()
+	go logLoop()
+	go signalLoop()
+
+	tunPump()
+}
+
+// --- состав пользователей --------------------------------------------------
+
+// loadTable — перечитать каталог ключей. Пользователи с тем же октетом,
+// именем и ключом ПЕРЕНОСЯТСЯ как есть: у подключённых не рвётся ни ключевое
+// расписание, ни выученный адрес.
+func loadTable(prev *table) (*table, error) {
+	ents, err := os.ReadDir(keyDirPath)
+	if err != nil {
+		return nil, err
+	}
+	byInner := make(map[string]*user)
+	var users []*user
+	seen := make(map[int]string)
+	for _, e := range ents {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".key") {
+			continue
+		}
+		base := strings.TrimSuffix(e.Name(), ".key")
+		slotStr, name, ok := strings.Cut(base, "-")
+		if !ok || name == "" {
+			log.Printf("ключ %s пропущен: имя файла должно быть <октет>-<имя>.key", e.Name())
+			continue
+		}
+		slot, cerr := strconv.Atoi(slotStr)
+		if cerr != nil || slot < slotMin || slot > slotMax {
+			log.Printf("ключ %s пропущен: октет %q вне диапазона %d..%d", e.Name(), slotStr, slotMin, slotMax)
+			continue
+		}
+		if other, dup := seen[slot]; dup {
+			log.Printf("ключ %s пропущен: октет %d уже занят файлом %s", e.Name(), slot, other)
+			continue
+		}
+		if len(users) >= maxUsersN {
+			log.Printf("ключ %s пропущен: достигнут предел -maxusers=%d", e.Name(), maxUsersN)
+			continue
+		}
+		master, kerr := chaossync.LoadMasterKey(filepath.Join(keyDirPath, e.Name()))
+		if kerr != nil {
+			log.Printf("ключ %s пропущен: %v", e.Name(), kerr)
+			continue
+		}
+		in := innerFor(slot)
+		v6net := v6NetFor(slot)
+		u := reuse(prev, slot, name, master)
+		if u == nil {
+			now := time.Now()
+			u = &user{
+				name: name, slot: slot, inner: in, v6net: v6net, master: master,
+				rx: chaossync.NewRotatingReceiver(master, dirIn, epochT, now),
+				tx: chaossync.NewRotatingSender(master, dirOut, epochT, now),
+			}
+		}
+		u.v6net = v6net
+		seen[slot] = e.Name()
+		users = append(users, u)
+		byInner[string(in.To4())] = u
+	}
+	sort.Slice(users, func(i, j int) bool { return users[i].slot < users[j].slot })
+	return &table{users: users, byInner: byInner}, nil
+}
+
+func reuse(prev *table, slot int, name string, master []byte) *user {
+	if prev == nil {
+		return nil
+	}
+	for _, u := range prev.users {
+		if u.slot == slot && u.name == name && bytes.Equal(u.master, master) {
+			return u
+		}
+	}
+	return nil
+}
+
+func innerFor(slot int) net.IP {
+	b := innerNet.IP.To4()
+	return net.IPv4(b[0], b[1], b[2], byte(slot)).To4()
+}
+
+func v6NetFor(slot int) *net.IPNet {
+	_, n, _ := net.ParseCIDR(fmt.Sprintf("2001:db8:1:%04x::/64", slot))
+	return n
+}
+
+func userForV6(t *table, ip net.IP) *user {
+	for _, u := range t.users {
+		if u.v6net != nil && u.v6net.Contains(ip) {
+			return u
+		}
+	}
+	return nil
+}
+
+func broadcastOf(n *net.IPNet) net.IP {
+	ip := n.IP.To4()
+	m := []byte(n.Mask)
+	if len(m) == 16 {
+		m = m[12:]
+	}
+	if ip == nil || len(m) != 4 {
+		return nil
+	}
+	out := make(net.IP, 4)
+	for i := 0; i < 4; i++ {
+		out[i] = ip[i] | ^m[i]
+	}
+	return out
+}
+
+func logTable(t *table) {
+	if len(t.users) == 0 {
+		log.Printf("состав ПУСТ: положи ключи в %s (файл <октет>-<имя>.key, права 0600) и пришли SIGHUP", keyDirPath)
+		return
+	}
+	for _, u := range t.users {
+		log.Printf("пользователь %-16s внутренний %s v6=%s (seal-воркер %d)", u.name, u.inner, u.v6net, u.slot%nWorkers)
+	}
+}
+
+func reload() {
+	tabMu.Lock()
+	defer tabMu.Unlock()
+	old := tab.Load()
+	nt, err := loadTable(old)
+	if err != nil {
+		log.Printf("SIGHUP: перечитать %s не вышло: %v — работаю на прежнем составе", keyDirPath, err)
+		return
+	}
+	tab.Store(nt)
+	live := make(map[*user]bool, len(nt.users))
+	for _, u := range nt.users {
+		live[u] = true
+	}
+	srcCache.Range(func(k, v any) bool {
+		if u, ok := v.(*user); ok && !live[u] {
+			srcCache.Delete(k)
+		}
+		return true
+	})
+	log.Printf("SIGHUP: состав перечитан (%d пользователей)", len(nt.users))
+	logTable(nt)
+}
+
+// --- провод -> TUN ---------------------------------------------------------
+
+func udpReader() {
+	buf := make([]byte, 2048)
+	for {
+		n, src, err := sock.ReadFromUDP(buf)
+		if err != nil {
+			return
+		}
+		d := make([]byte, n)
+		copy(d, buf[:n])
+		select {
+		case datch <- inPkt{d, src}:
+		default:
+			cQFull.Add(1)
+		}
+	}
+}
+
+func ingestWorker() {
+	for p := range datch {
+		cUdpRecv.Add(1)
+		u, plain := demux(p)
+		if u == nil {
+			cDropped.Add(1) // probe-invisibility: молчим
+			continue
+		}
+		cIngestOK.Add(1)
+		if !accept(u, plain) {
+			continue
+		}
+		u.peer.Store(p.src)
+		u.lastRx.Store(time.Now().Unix())
+		u.pktIn.Add(1)
+		u.byteIn.Add(uint64(len(plain)))
+		cTunWrite.Add(1)
+		if _, err := tunDev.Write(plain); err != nil {
+			log.Printf("tun write: %v", err)
+		}
+	}
+}
+
+// demux — чей это пакет. Сначала кэш адреса (устойчивый режим: одна
+// проверка), иначе перебор состава; промах по всем = шум, молчим.
+func demux(p inPkt) (*user, []byte) {
+	t := tab.Load()
+	if t == nil {
+		return nil, nil
+	}
+	key := p.src.String()
+	if v, ok := srcCache.Load(key); ok {
+		if u, ok2 := v.(*user); ok2 {
+			if plain, ok3 := u.open(p.data); ok3 {
+				return u, plain
+			}
+			srcCache.Delete(key) // адрес переехал к другому человеку
+		}
+	}
+	for _, u := range t.users {
+		if plain, ok := u.open(p.data); ok {
+			srcCache.Store(key, u)
+			return u, plain
+		}
+	}
+	return nil, nil
+}
+
+// accept — анти-спуфинг и изоляция. Ключ доказал личность, но адрес источника
+// внутри туннеля обязан быть его собственным: иначе один пользователь мог бы
+// писать от имени другого.
+func accept(u *user, plain []byte) bool {
+	if len(plain) < 20 {
+		cDropped.Add(1)
+		return false
+	}
+	switch plain[0] >> 4 {
+	case 4:
+		if !net.IP(plain[12:16]).Equal(u.inner) {
+			cSpoof.Add(1)
+			return false
+		}
+		dst := net.IP(plain[16:20])
+		if dst[0] >= 224 || (innerBcast != nil && dst.Equal(innerBcast)) {
+			cIsolated.Add(1)
+			return false
+		}
+		if !allowPeer && innerNet.Contains(dst) && !dst.Equal(selfInner) {
+			cIsolated.Add(1)
+			return false
+		}
+		return true
+	case 6:
+		if len(plain) < 40 || u.v6net == nil {
+			cV6Drop.Add(1)
+			return false
+		}
+		src := net.IP(plain[8:24])
+		if !u.v6net.Contains(src) {
+			cSpoof.Add(1)
+			return false
+		}
+		dst := net.IP(plain[24:40])
+		if !allowPeer && hubV6Net != nil && hubV6Net.Contains(dst) && !u.v6net.Contains(dst) {
+			cIsolated.Add(1)
+			return false
+		}
+		return true
+	default:
+		cDropped.Add(1)
+		return false
+	}
+}
+
+// --- TUN -> провод ---------------------------------------------------------
+
+func tunPump() {
+	buf := make([]byte, 2048)
+	for {
+		n, err := tunDev.Read(buf)
+		if err != nil {
+			log.Fatalf("tun read: %v", err)
+		}
+		cTunRead.Add(1)
+		if n < 20 {
+			continue
+		}
+		t := tab.Load()
+		if t == nil {
+			cNoRoute.Add(1)
+			continue
+		}
+		var u *user
+		switch buf[0] >> 4 {
+		case 4:
+			u = t.byInner[string(buf[16:20])]
+		case 6:
+			if n < 40 {
+				cV6Drop.Add(1)
+				continue
+			}
+			u = userForV6(t, net.IP(buf[8:24]))
+		default:
+			cDropped.Add(1)
+			continue
+		}
+		if u == nil {
+			cNoRoute.Add(1)
+			continue
+		}
+		if !peerFresh(u) {
+			cNoPeer.Add(1)
+			continue
+		}
+		d := make([]byte, n)
+		copy(d, buf[:n])
+		q := outq[u.slot%nWorkers]
+		select {
+		case q <- outPkt{u, d}:
+		default:
+			cQFull.Add(1)
+		}
+	}
+}
+
+// sealWorker — закреплённый воркер: только он трогает tx своих пользователей,
+// поэтому порядок датаграмм внутри туннеля сохранён без мьютекса.
+func sealWorker(q chan outPkt) {
+	for p := range q {
+		u := p.u
+		peer := u.peer.Load()
+		if peer == nil {
+			cNoPeer.Add(1)
+			continue
+		}
+		u.tx.TickEpoch(time.Now())
+		wire := u.tx.Seal(p.data)
+		if _, err := sock.WriteToUDP(wire, peer); err != nil {
+			cSendErr.Add(1)
+			continue
+		}
+		cSent.Add(1)
+		u.pktOut.Add(1)
+		u.byteOut.Add(uint64(len(p.data)))
+	}
+}
+
+func peerFresh(u *user) bool {
+	if u.peer.Load() == nil {
+		return false
+	}
+	last := u.lastRx.Load()
+	return last != 0 && time.Now().Unix()-last <= idleLimit
+}
+
+// --- наблюдаемость ---------------------------------------------------------
+
+func logLoop() {
+	tk := time.NewTicker(2 * time.Second)
+	for range tk.C {
+		t := tab.Load()
+		online, total := 0, 0
+		if t != nil {
+			total = len(t.users)
+			for _, u := range t.users {
+				if peerFresh(u) {
+					online++
+				}
+			}
+		}
+		log.Printf("хаб: онлайн=%d/%d tunRd=%d tunWr=%d udpRecv=%d ingestOK=%d sent=%d dropped=%d spoof=%d isol=%d noRoute=%d noPeer=%d v6drop=%d qfull=%d sendErr=%d",
+			online, total, cTunRead.Load(), cTunWrite.Load(), cUdpRecv.Load(), cIngestOK.Load(),
+			cSent.Load(), cDropped.Load(), cSpoof.Load(), cIsolated.Load(), cNoRoute.Load(),
+			cNoPeer.Load(), cV6Drop.Load(), cQFull.Load(), cSendErr.Load())
+	}
+}
+
+func statusLoop() {
+	if statusFile == "" {
+		return
+	}
+	if err := os.MkdirAll(filepath.Dir(statusFile), 0o750); err != nil {
+		log.Printf("состояние: каталог %s: %v", filepath.Dir(statusFile), err)
+		return
+	}
+	tk := time.NewTicker(5 * time.Second)
+	for range tk.C {
+		writeStatus()
+	}
+}
+
+func writeStatus() {
+	t := tab.Load()
+	now := time.Now().Unix()
+	list := make([]map[string]any, 0, 8)
+	if t != nil {
+		for _, u := range t.users {
+			age := int64(-1)
+			if l := u.lastRx.Load(); l != 0 {
+				age = now - l
+			}
+			peer := ""
+			if p := u.peer.Load(); p != nil {
+				peer = p.String()
+			}
+			list = append(list, map[string]any{
+				"name": u.name, "slot": u.slot, "inner": u.inner.String(), "ipv6": u.v6net.String(),
+				"online": peerFresh(u), "lastRxSec": age, "peer": peer,
+				"pktIn": u.pktIn.Load(), "pktOut": u.pktOut.Load(),
+				"bytesIn": u.byteIn.Load(), "bytesOut": u.byteOut.Load(),
+			})
+		}
+	}
+	doc := map[string]any{
+		"version": hubVersion,
+		"time":    time.Now().Format(time.RFC3339),
+		"inner":   innerNet.String(),
+		"self":    selfInner.String(),
+		"workers": nWorkers,
+		"isolate": !allowPeer,
+		"users":   list,
+		"totals": map[string]any{
+			"tunRead": cTunRead.Load(), "tunWrite": cTunWrite.Load(),
+			"udpRecv": cUdpRecv.Load(), "ingestOK": cIngestOK.Load(),
+			"sent": cSent.Load(), "dropped": cDropped.Load(),
+			"spoof": cSpoof.Load(), "isolated": cIsolated.Load(),
+			"noRoute": cNoRoute.Load(), "noPeer": cNoPeer.Load(),
+			"v6drop": cV6Drop.Load(), "qfull": cQFull.Load(),
+			"sendErr": cSendErr.Load(),
+		},
+	}
+	b, err := json.MarshalIndent(doc, "", "  ")
+	if err != nil {
+		return
+	}
+	tmp := statusFile + ".tmp"
+	if err := os.WriteFile(tmp, b, 0o640); err != nil {
+		return
+	}
+	os.Rename(tmp, statusFile)
+}
+
+func signalLoop() {
+	sigc := make(chan os.Signal, 4)
+	signal.Notify(sigc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	for s := range sigc {
+		if s == syscall.SIGHUP {
+			reload()
+			continue
+		}
+		log.Printf("сигнал %v — закрываю сокет и TUN", s)
+		if sock != nil {
+			sock.Close()
+		}
+		if tunDev != nil {
+			tunDev.Close()
+		}
+		os.Exit(0)
+	}
+}

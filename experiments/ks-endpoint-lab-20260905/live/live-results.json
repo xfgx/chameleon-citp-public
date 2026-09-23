@@ -1,0 +1,165 @@
+{
+  "alias_internet": {
+    "returncode": 2,
+    "events": [
+      {
+        "event": "dial",
+        "endpoint": "192.0.2.11:443",
+        "time": "2026-09-05T10:59:36.373010154Z"
+      },
+      {
+        "event": "authentication_failed",
+        "endpoint": "192.0.2.11:443",
+        "detail": "tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2026-09-05T10:59:36Z is after 2026-04-24T20:04:45Z",
+        "time": "2026-09-05T10:59:36.532587073Z"
+      },
+      {
+        "event": "probe_failed",
+        "sequence": 1,
+        "detail": "all explicit endpoints unavailable: fail closed",
+        "time": "2026-09-05T10:59:36.533019026Z"
+      },
+      {
+        "event": "dial",
+        "endpoint": "192.0.2.11:443",
+        "time": "2026-09-05T10:59:36.633323527Z"
+      },
+      {
+        "event": "authentication_failed",
+        "endpoint": "192.0.2.11:443",
+        "detail": "tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2026-09-05T10:59:36Z is after 2026-04-24T20:04:45Z",
+        "time": "2026-09-05T10:59:36.79131568Z"
+      },
+      {
+        "event": "probe_failed",
+        "sequence": 2,
+        "detail": "all explicit endpoints unavailable: fail closed",
+        "time": "2026-09-05T10:59:36.791347739Z"
+      },
+      {
+        "event": "dial",
+        "endpoint": "192.0.2.11:443",
+        "time": "2026-09-05T10:59:36.891656015Z"
+      },
+      {
+        "event": "authentication_failed",
+        "endpoint": "192.0.2.11:443",
+        "detail": "tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2026-09-05T10:59:37Z is after 2026-04-24T20:04:45Z",
+        "time": "2026-09-05T10:59:37.053834776Z"
+      },
+      {
+        "event": "probe_failed",
+        "sequence": 3,
+        "detail": "all explicit endpoints unavailable: fail closed",
+        "time": "2026-09-05T10:59:37.053859031Z"
+      },
+      {
+        "event": "summary",
+        "sequence": 3,
+        "detail": "success=0 attempted=3",
+        "time": "2026-09-05T10:59:37.053867584Z"
+      },
+      {
+        "event": "fatal",
+        "detail": "one or more probes failed",
+        "time": "2026-09-05T10:59:37.053872622Z"
+      }
+    ]
+  },
+  "alias_local_control": "{\"event\":\"dial\",\"endpoint\":\"192.0.2.11:443\",\"time\":\"2026-09-05T10:59:37.428759365Z\"}\n{\"event\":\"connected\",\"endpoint\":\"192.0.2.11:443\",\"detail\":\"TLS1.3, verified node key\",\"time\":\"2026-09-05T10:59:37.431555593Z\"}\n{\"event\":\"probe_ok\",\"endpoint\":\"192.0.2.11:443\",\"sequence\":1,\"time\":\"2026-09-05T10:59:37.432270997Z\"}\n{\"event\":\"probe_ok\",\"endpoint\":\"192.0.2.11:443\",\"sequence\":2,\"time\":\"2026-09-05T10:59:37.532924588Z\"}\n{\"event\":\"probe_ok\",\"endpoint\":\"192.0.2.11:443\",\"sequence\":3,\"time\":\"2026-09-05T10:59:37.633499775Z\"}\n{\"event\":\"summary\",\"sequence\":3,\"detail\":\"success=3 attempted=3\",\"time\":\"2026-09-05T10:59:37.633636163Z\"}\n",
+  "primary_internet_control": {
+    "returncode": 0,
+    "events": [
+      {
+        "event": "dial",
+        "endpoint": "192.0.2.10:443",
+        "time": "2026-09-05T10:59:39.079920581Z"
+      },
+      {
+        "event": "connected",
+        "endpoint": "192.0.2.10:443",
+        "detail": "TLS1.3, verified node key",
+        "time": "2026-09-05T10:59:39.241833935Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 1,
+        "time": "2026-09-05T10:59:39.321709285Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 2,
+        "time": "2026-09-05T10:59:39.506684847Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 3,
+        "time": "2026-09-05T10:59:39.688548597Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 4,
+        "time": "2026-09-05T10:59:39.869295823Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 5,
+        "time": "2026-09-05T10:59:40.049417696Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 6,
+        "time": "2026-09-05T10:59:40.23169671Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 7,
+        "time": "2026-09-05T10:59:40.411816352Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 8,
+        "time": "2026-09-05T10:59:40.592045721Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 9,
+        "time": "2026-09-05T10:59:40.772580229Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 10,
+        "time": "2026-09-05T10:59:40.954743097Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 11,
+        "time": "2026-09-05T10:59:41.134914383Z"
+      },
+      {
+        "event": "probe_ok",
+        "endpoint": "192.0.2.10:443",
+        "sequence": 12,
+        "time": "2026-09-05T10:59:41.315273047Z"
+      },
+      {
+        "event": "summary",
+        "sequence": 12,
+        "detail": "success=12 attempted=12",
+        "time": "2026-09-05T10:59:41.315317885Z"
+      }
+    ]
+  },
+  "mcp_capture_packets": 116
+}

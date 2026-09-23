@@ -1,0 +1,189 @@
+{
+  "after_feedback_priority_checks_passed": true,
+  "cases_including_witnesses": 3,
+  "certificate_beats_greedy_states": 1,
+  "certificate_beats_old_recommendation_states": 0,
+  "certificate_oracle_matches": 3,
+  "client_rx_application_bytes_including_framing": 2932,
+  "client_tx_application_bytes_including_framing": 4915,
+  "controls": [
+    {
+      "decoded": 0,
+      "name": "empty_negative",
+      "passed": true
+    },
+    {
+      "decoded": 5,
+      "name": "systematic_positive",
+      "passed": true
+    },
+    {
+      "decoded": 0,
+      "name": "parity_no_repair",
+      "passed": true
+    },
+    {
+      "decoded": 0,
+      "name": "duplicate_zero",
+      "passed": true
+    }
+  ],
+  "descriptor_larger_than_dense_basis_states": 1,
+  "descriptor_smaller_than_dense_basis_states": 0,
+  "distinct_subspaces": 1,
+  "elapsed_seconds": 2.9926148522645235,
+  "novelty": "incomplete prior-art check; known algebra; no discovery claim",
+  "payload_hash_checks_passed": true,
+  "scope": "live MCP-to-RU TCP payload reconstruction; controlled finite decoder states, not Internet loss/deadline performance",
+  "server_finish": {
+    "elapsed_seconds": 2.9928407080005854,
+    "finished": true,
+    "requests": 11,
+    "rx_application_bytes_before_finish_reply": 4915,
+    "tx_application_bytes_before_finish_reply": 2764
+  },
+  "status": "passed",
+  "witnesses": [
+    {
+      "actions": {
+        "certificate": [
+          0,
+          1
+        ],
+        "greedy": [
+          0,
+          1
+        ],
+        "recommendation": [
+          0,
+          1
+        ]
+      },
+      "basis": [
+        7
+      ],
+      "case": "matched_witness_7",
+      "certificate": {
+        "labels": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rank": 1,
+        "triangles": [
+          [
+            1,
+            2,
+            3
+          ]
+        ]
+      },
+      "certificate_json_bytes": 53,
+      "dense_basis_coefficient_bits_excluding_rank_and_framing": 5,
+      "descriptor_raw_bits_excluding_rank_and_framing": 25,
+      "feedback_before_weights": true,
+      "oracle_score": 3,
+      "recovered": {
+        "certificate": [
+          0,
+          1,
+          2
+        ],
+        "greedy": [
+          0,
+          1,
+          2
+        ],
+        "recommendation": [
+          0,
+          1,
+          2
+        ]
+      },
+      "scores": {
+        "certificate": 3,
+        "greedy": 3,
+        "recommendation": 3
+      },
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "actions": {
+        "certificate": [
+          2,
+          3
+        ],
+        "greedy": [
+          0,
+          1
+        ],
+        "recommendation": [
+          2,
+          3
+        ]
+      },
+      "basis": [
+        28
+      ],
+      "case": "matched_witness_28",
+      "certificate": {
+        "labels": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "rank": 1,
+        "triangles": [
+          [
+            3,
+            4,
+            5
+          ]
+        ]
+      },
+      "certificate_json_bytes": 53,
+      "dense_basis_coefficient_bits_excluding_rank_and_framing": 5,
+      "descriptor_raw_bits_excluding_rank_and_framing": 25,
+      "feedback_before_weights": true,
+      "oracle_score": 3,
+      "recovered": {
+        "certificate": [
+          2,
+          3,
+          4
+        ],
+        "greedy": [
+          0,
+          1
+        ],
+        "recommendation": [
+          2,
+          3,
+          4
+        ]
+      },
+      "scores": {
+        "certificate": 3,
+        "greedy": 2,
+        "recommendation": 3
+      },
+      "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ]
+}

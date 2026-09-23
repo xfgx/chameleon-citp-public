@@ -1,0 +1,39 @@
+name: citp-v3
+on:
+  push:
+    paths:
+      - 'internal/chameleon/**'
+      - 'tools/citp-sim/**'
+      - 'tools/ttl-smuggle/**'
+      - '.github/workflows/citp-v3.yml'
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.3'
+          cache: true
+      - name: Unit и интеграционные тесты CITP v3.0
+        run: go test -run 'ZPL4|Phantom|Shannon|RandomIP|TTLS' -v ./internal/chameleon
+      - name: Полный прогон пакета
+        run: go test ./internal/chameleon
+      - name: Vet
+        run: go vet ./internal/chameleon ./tools/citp-sim ./tools/ttl-smuggle
+      - name: Сквозной selftest TTL-smuggle
+        run: go run ./tools/ttl-smuggle -mode selftest -count 5
+      - name: Сборка бинарников CITP v3.0
+        run: |
+          mkdir -p dist/release
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o dist/release/citp-sim-linux-amd64 ./tools/citp-sim
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o dist/release/citp-sim-windows-amd64.exe ./tools/citp-sim
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o dist/release/ttl-smuggle-linux-amd64 ./tools/ttl-smuggle
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags='-s -w' -o dist/release/ttl-smuggle-windows-amd64.exe ./tools/ttl-smuggle
+          cd dist/release && sha256sum citp-sim-* ttl-smuggle-* > SHA256SUMS-citp-v3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: citp-v3-binaries
+          path: dist/release/

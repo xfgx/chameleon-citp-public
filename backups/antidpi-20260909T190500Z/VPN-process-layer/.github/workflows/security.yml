@@ -1,0 +1,29 @@
+name: protocol-security
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  correctness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.3'
+          cache: true
+      - name: Unit, property and fault-injection tests
+        run: go test ./internal/chameleon
+      - name: Race detector
+        run: go test -race ./internal/chameleon ./cmd/cham-server
+      - name: Vet
+        run: go vet ./internal/chameleon ./cmd/cham-server
+      - name: Python reference parser
+        run: |
+          python3 -m py_compile protocol/reference_parser.py
+          python3 protocol/reference_parser.py
+      - name: Fuzz smoke
+        env:
+          FUZZ_TIME: 15s
+        run: ./scripts/security-check.sh

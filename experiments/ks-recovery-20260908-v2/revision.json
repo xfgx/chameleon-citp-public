@@ -1,0 +1,7 @@
+{
+  "revision": "v2",
+  "reason": "Isolated build was missing existing local internal/chameleon dependency; no tests executed in v1",
+  "prototype_logic_changed": false,
+  "prior_logs_preserved": true,
+  "prior_driver_state": "Z"
+}

@@ -1,0 +1,5 @@
+your-node.example.com
+2026-09-08T17:53:29Z
+go version go1.26.3 linux/amd64
+1c70557dff5f07d379fdc8f89c7b2d747a8e7bdf25e1a998868d595b4e3dbc10  project/internal/chaossync/ks.go
+1e59b61a20cbf8fccd21cef40985f2fe1ee9bd3c3e4cd0d0cd3c133b7c0462b5  project/internal/chaossync/ks_r1_length_test.go

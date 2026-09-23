@@ -1,0 +1,1 @@
+No secret is included. Place only your assigned existing client key here as ks-vpn.key. Never share this file; restrict its NTFS ACL to your account and administrators. Each device needs its own allocated profile.

@@ -1,0 +1,8 @@
+{
+  "ks_recovery_lab.go": "05dc80281539a33b76b2d1440376ec21a1cc5e0b020481b44556b555ae066af5",
+  "ks_recovery_lab_test.go": "04afdfd00ac8807ecb675e1c3cdcc28484950261a8018753f2d5e6cdcc20687e",
+  "main.go": "03323a75c1b0ecd8a894c7c6912c7b2aec889d958710e9efe1e032e1c098ddb4",
+  "driver.py": "47b55e8b362885c0c123138e707864ffab70fc82e39556dd681f344f3e045feb",
+  "protocol.md": "ec18d8bacfa6e3b516d2a2ecda1695acc2bee6bd07f39cb9092d202280ce693b",
+  "full_preregistration_sha256": "edd71929ee5621181453dc34f0e978f9389fc71e3f70ea7e397f0650efeaa4bf"
+}

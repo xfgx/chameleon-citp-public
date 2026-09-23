@@ -1,0 +1,14 @@
+{
+  "existing": [
+    "/root/cham-server",
+    "/root/cham-server.key",
+    "/root/cham-clients.txt",
+    "/etc/systemd/system/cham-server.service",
+    "/root/.ssh/authorized_keys"
+  ],
+  "absent": [
+    "/etc/systemd/system/cham-server.service.d",
+    "/usr/local/bin/vpn-node-agent",
+    "/etc/chameleon/node-agent.json"
+  ]
+}

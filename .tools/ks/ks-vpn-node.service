@@ -1,0 +1,16 @@
+[Unit]
+Description=Chameleon KS-VPN — keystream-inversion chaos data-plane node (experimental)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/build
+ExecStartPre=/bin/sh -c 'sysctl -w net.ipv4.ip_forward=1; nft add table ip ks_nat 2>/dev/null || true; nft add chain ip ks_nat post "{ type nat hook postrouting priority srcnat; }" 2>/dev/null || true; nft add rule ip ks_nat post ip saddr 10.99.0.0/24 oifname ens3 masquerade 2>/dev/null || true'
+ExecStart=/root/build/ks-vpn -keyfile /root/build/ks-vpn.key -tunip 10.99.0.2/24 -peerport 23500 -listen 51820 -outdir n2c -indir c2n -T 8
+Restart=always
+RestartSec=3
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

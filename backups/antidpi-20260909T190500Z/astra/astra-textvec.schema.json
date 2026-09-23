@@ -1,0 +1,62 @@
+{
+  "name": "textvec_v1",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "v", "geometry", "why", "back", "flags"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Identifier of the encoded text, e.g. single, b01, a, b."
+      },
+      "v": {
+        "type": "array",
+        "description": "Exactly 12 values on the 0.05 grid in order t01..t12.",
+        "items": { "type": "number" }
+      },
+      "geometry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["norm", "top", "neutral_axes"],
+        "properties": {
+          "norm": {
+            "type": "number",
+            "description": "L2 norm of (v - 0.5), rounded to 2 decimals, max 1.73."
+          },
+          "top": {
+            "type": "array",
+            "description": "Three strongest axes as t09+ / t01- , strongest first.",
+            "items": { "type": "string" }
+          },
+          "neutral_axes": {
+            "type": "integer",
+            "description": "Count of axes exactly equal to 0.50."
+          }
+        }
+      },
+      "why": {
+        "type": "array",
+        "description": "One entry for each axis with |v - 0.5| >= 0.25, and no others.",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["axis", "value", "reason"],
+          "properties": {
+            "axis": { "type": "string" },
+            "value": { "type": "number" },
+            "reason": { "type": "string" }
+          }
+        }
+      },
+      "back": {
+        "type": "string",
+        "description": "Reconstruction from the vector alone, 1-2 sentences."
+      },
+      "flags": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    }
+  }
+}

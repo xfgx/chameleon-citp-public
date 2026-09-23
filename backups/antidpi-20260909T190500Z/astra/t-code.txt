@@ -1,0 +1,8 @@
+def merge(a, b):
+    out = {}
+    for k in set(a) | set(b):
+        out[k] = a.get(k, 0) + b.get(k, 0)
+    return out
+
+2026-09-09T14:22:07Z WARN retry=3 latency_ms=812 status=502
+2026-09-09T14:22:11Z INFO retry=4 latency_ms=97 status=200

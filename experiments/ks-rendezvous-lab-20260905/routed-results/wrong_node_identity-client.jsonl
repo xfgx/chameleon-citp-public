@@ -1,0 +1,9 @@
+{"event":"dial","endpoint":"[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443","time":"2026-09-05T11:34:14.700654929Z"}
+{"event":"authentication_failed","endpoint":"[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443","detail":"wrong node identity","time":"2026-09-05T11:34:14.703176231Z"}
+{"event":"dial","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","time":"2026-09-05T11:34:14.703203566Z"}
+{"event":"dial_failed","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","detail":"dial tcp [2001:db8:300:0:7345:dd12:8ac0:ae81]:24443: i/o timeout","time":"2026-09-05T11:34:15.903644751Z"}
+{"event":"dial","endpoint":"[2001:db8:300:0:198e:5b25:680:acd]:24443","time":"2026-09-05T11:34:15.90376672Z"}
+{"event":"authentication_failed","endpoint":"[2001:db8:300:0:198e:5b25:680:acd]:24443","detail":"wrong node identity","time":"2026-09-05T11:34:15.906271014Z"}
+{"event":"probe_failed","sequence":1,"detail":"all explicit endpoints unavailable: fail closed","time":"2026-09-05T11:34:15.906287065Z"}
+{"event":"summary","sequence":1,"detail":"success=0 attempted=1","time":"2026-09-05T11:34:15.906297791Z"}
+{"event":"fatal","detail":"one or more probes failed","time":"2026-09-05T11:34:15.906302185Z"}

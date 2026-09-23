@@ -1,0 +1,8 @@
+{
+  "PeerHost": "",
+  "PeerPort": 51830,
+  "TunIP": "",
+  "ListenPort": 23500,
+  "EpochSeconds": 8,
+  "FullTun": true
+}

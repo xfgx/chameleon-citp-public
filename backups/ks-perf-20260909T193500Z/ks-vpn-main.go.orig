@@ -1,0 +1,459 @@
+// ks-vpn — TUN↔KS мост: data-plane на keystream-инверсии ядра chaossync.
+//
+// Wire: headerless UDP-датаграммы nonce‖ct, по одному порту на направление.
+// Потеря датаграммы = потерянный IP-пакет (TCP выше перешлёт): состояние
+// решётки не рвётся — она шагает по счётчику, не по прибытию. Ротация эпох
+// бесплатная (общий счётчик времени, без in-band налога).
+//
+// Probe-invisible: отвечаем только на AEAD-валидные датаграммы, всё прочее
+// (включая активные пробы) — ноль ответа; адрес клиента нода учит только от
+// валидных датаграмм (не от шума сканеров).
+//
+// Надёжность: мост несёт СЫРОЙ IP; внутренний TCP приложений надёжен
+// end-to-end. Платформенно-зависима только TUN-часть (tun_linux.go —
+// переиспользована из cdt-vpn без изменений; tun_windows.go — Wintun).
+//
+// IPv6-транзит (2026-09-04): -tunv6 не глушит v6 на TUN (ноды транзита),
+// -v6prefix/-v6rot на клиенте — ротация исходного адреса из собственного
+// делегированного пула (routed /48 нашего 6in4): новые потоки уходят со
+// свежего случайного адреса, ноды маршрутизируют пул префиксно.
+//
+// v6-ПРОВОД (2026-09-04, wirev6.go): -peerpool6 на клиенте — каждая
+// KS-датаграмма уходит со случайного свободного порта на СЛУЧАЙНЫЙ v6-адрес
+// из routed-пула ноды; нода слушает весь пул (anyip) и отвечает ровно с
+// того адреса, на который пришла датаграмма (IPv6 pktinfo). Нет нативного
+// v6 у клиента — автоматический откат на v4-провод, ничего не ломается.
+// По умолчанию всё новое выключено — поведение v4 не меняется.
+package main
+
+import (
+	"flag"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+	"runtime"
+	"strconv"
+	"sync/atomic"
+	"time"
+
+	"chameleon/internal/chaossync"
+
+	"golang.org/x/net/ipv6"
+)
+
+// счётчики стадий моста (отладка/метрики)
+var (
+	cTunRead   atomic.Uint64 // IP-пакетов прочитано из TUN
+	cSent      atomic.Uint64 // датаграмм запечатано и отправлено
+	cUdpRecv   atomic.Uint64 // UDP-датаграмм принято с провода
+	cIngestOK  atomic.Uint64 // прошли AEAD (валидные)
+	cDropped   atomic.Uint64 // шум/чужие/повторы — молча отброшено
+	cTunWrite  atomic.Uint64 // IP-пакетов записано в TUN
+	cLoopGuard atomic.Uint64 // отброшено петлестопом (пакеты к проводному IP ноды)
+	lastRxUnix atomic.Int64  // время последней валидной датаграммы (unix; 0 = не было)
+	cHitFb     atomic.Uint64 // ответов v6-пиру БЕЗ hit-адреса (фолбэк на адрес туннеля)
+)
+
+// lastPeer — адрес клиента, выученный от ВАЛИДНЫХ (расшифрованных) датаграмм.
+// Нода отвечает ему; учится не от шума, а после AEAD.
+var lastPeer atomic.Value // *net.UDPAddr
+
+// lastHit6 — v6-адрес ПУЛА НОДЫ, на который пришла последняя валидная
+// v6-датаграмма (из pktinfo). Нода отвечает ровно с него: stateful-файрвол
+// на стороне клиента ждёт ответ с того адреса, куда слали.
+var lastHit6 atomic.Value // net.IP
+
+type inPkt struct {
+	data []byte
+	src  *net.UDPAddr
+	hit  net.IP // наш локальный адрес, на который пришла датаграмма (v6 pktinfo; nil для v4)
+}
+
+func main() {
+	keyfile := flag.String("keyfile", "ks-vpn.key", "файл мастер-ключа (0600)")
+	genkey := flag.Bool("genkey", false, "создать мастер-ключ (0600) и выйти")
+	tunName := flag.String("tun", "ks0", "имя TUN-адаптера")
+	tunIP := flag.String("tunip", "", "мой туннельный IP/CIDR (обязателен)")
+	peerHost := flag.String("peerhost", "", "IP ноды (обязателен на клиенте; на ноде пусто — учится)")
+	listenPort := flag.Int("listen", 24001, "мой UDP-порт приёма")
+	peerPort := flag.Int("peerport", 24000, "UDP-порт приёма peer'а")
+	outDir := flag.String("outdir", "c2n", "Dir исходящего направления")
+	inDir := flag.String("indir", "n2c", "Dir входящего направления")
+	rotT := flag.Uint64("T", 8, "период ротации эпох, сек (одинаковый на обеих сторонах)")
+	fullTun := flag.Bool("fulltun", false, "полный VPN (Windows-клиент): сам настроить маршруты — обходной /32 до ноды + сплит /1 в туннель + /32 до приватных DNS; по Ctrl+C снять")
+	peerTun := flag.String("peertunip", "", "туннельный IP ноды для keepalive (пусто = тот же /24, хост .2)")
+	tunV6 := flag.Bool("tunv6", false, "не глушить IPv6 на TUN (транзит v6-пакетов туннеля; ноды цепочки)")
+	v6Prefix := flag.String("v6prefix", "", "пул ротации исходных v6-адресов клиента (напр. 2001:db8:1::/48); клиентская роль")
+	v6Rot := flag.Uint64("v6rot", 5, "период смены v6-адреса источника, сек (мин 1)")
+	peerPool6 := flag.String("peerpool6", "", "клиент: routed v6-пул ноды для провода (напр. 2001:db8:2::/48); каждая датаграмма — на случайный адрес пула, со случайного свободного порта")
+	wire6Rot := flag.Uint64("wire6rot", 30, "клиент: пересадка случайного исходного порта v6-провода, сек (0 = порт на весь запуск)")
+	wire6Src := flag.String("wire6src", "", "клиент: пул ИСХОДНЫХ v6-адресов провода — \"auto\" (нативный префикс провайдера) или CIDR; каждая датаграмма уходит со случайного адреса набора")
+	wire6SrcN := flag.Int("wire6srcn", 16, "клиент: сколько исходных v6-адресов держать одновременно (1..64)")
+	flag.Parse()
+
+	log.SetPrefix("[ks-vpn] ")
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
+	if *genkey {
+		if err := chaossync.GenerateMasterKey(*keyfile); err != nil {
+			log.Fatalf("genkey: %v", err)
+		}
+		log.Printf("мастер-ключ создан: %s (0600). Положи ТОТ ЖЕ файл на ноду и клиент", *keyfile)
+		return
+	}
+	if *tunIP == "" {
+		log.Fatal("нужен -tunip (туннельный IP/CIDR)")
+	}
+
+	// проводной IP ноды — для петлестопа (ниже)
+	var peerIP4 net.IP
+	if *peerHost != "" {
+		peerIP4 = net.ParseIP(*peerHost).To4()
+		if peerIP4 == nil {
+			log.Printf("внимание: -peerhost %q не IPv4 — петлестоп выключен", *peerHost)
+		}
+	}
+	master, err := chaossync.LoadMasterKey(*keyfile)
+	if err != nil {
+		log.Fatalf("fail-closed: ключ: %v", err)
+	}
+
+	tun, ifname, err := openTUN(*tunName, *tunIP, *tunV6)
+	if err != nil {
+		log.Fatalf("fail-closed: TUN: %v", err)
+	}
+	log.Printf("TUN %s поднят с %s (tunv6=%v)", ifname, *tunIP, *tunV6)
+
+	// keystream-концы направлений (общий счётчик эпох на обеих сторонах)
+	tx := chaossync.NewRotatingSender(master, *outDir, *rotT, time.Now())
+	rx := chaossync.NewRotatingReceiver(master, *inDir, *rotT, time.Now())
+
+	// общий канал приёма (v4-сокет и v6-провод сливаются сюда)
+	datch := make(chan inPkt, 8192)
+
+	// сеть: один сокет приёма; отправка — с того же сокета (NAT-дыра совпадает).
+	// ListenUDP("udp") — dual-stack wildcard [::]:port: v6-датаграммы пула ноды
+	// принимаются тем же сокетом (bindv6only=0), v4-провод не меняется.
+	sock, err := net.ListenUDP("udp", &net.UDPAddr{Port: *listenPort})
+	if err != nil {
+		log.Fatalf("fail-closed: слушатель UDP :%d: %v", *listenPort, err)
+	}
+	log.Printf("слушаю UDP :%d; исходящее -> %s:%d", *listenPort, *peerHost, *peerPort)
+
+	// pktinfo: на ноде узнаём, на КАКОЙ адрес пула пришла датаграмма — чтобы
+	// ответить ровно с него (stateful-файрволы клиента ждут ответ с него же).
+	pconn := ipv6.NewPacketConn(sock)
+	if err := pconn.SetControlMessage(ipv6.FlagDst, true); err != nil {
+		log.Printf("pktinfo FlagDst: %v — v6-ответы пойдут с адреса туннеля (дефолт)", err)
+	}
+	// IPV6_FREEBIND (freebind_linux.go; на прочих платформах — no-op):
+	// pktinfo-источник из anyip-пула (local-роут на lo, без поадресного
+	// назначения) иначе отклоняется ядром EINVAL (доказано пробником в netns
+	// 2026-09-04; альтернатива — net.ipv6.ip_nonlocal_bind=1, но sockopt
+	// локальнее). На v4-путь не влияет.
+	setV6Freebind(sock)
+
+	// Откаты по Ctrl+C (полный VPN на Windows, v6-ротация, v6-провод).
+	var cleanups []func()
+	if *fullTun && runtime.GOOS == "windows" {
+		cleanups = append(cleanups, setupFullTun(*peerHost, *tunIP, *peerTun, *listenPort))
+	}
+
+	// Ротация исходного v6-адреса из собственного делегированного пула
+	// (клиентская роль). Сбой ротации не роняет туннель: v6 аддитивен к v4.
+	rotStarted := false
+	var rot *v6Rotator
+	if *v6Prefix != "" {
+		if *peerHost == "" {
+			log.Fatal("fail-closed: -v6prefix — клиентская роль (нужен -peerhost ноды)")
+		}
+		var err error
+		rot, err = newV6Rotator(*v6Prefix, ifname, *v6Rot)
+		if err != nil {
+			log.Fatalf("fail-closed: v6rot: %v", err)
+		}
+		if rc, err := rot.Start(); err != nil {
+			log.Printf("v6rot: %v — ротация выключена, туннель v4 не тронут", err)
+		} else {
+			cleanups = append(cleanups, rc)
+			rotStarted = true
+		}
+	}
+
+	// Клиентский v6-ПРОВОД к ноде: случайный источник -> случайный адрес её пула.
+	//
+	// FAIL-CLOSED (урок полевого прогона 14:22 2026-09-04): провод включаем
+	// ТОЛЬКО когда (1) у машины есть нативный глобальный v6-адрес для
+	// источника и (2) пул провода доказанно уведён МИМО туннеля. Иначе его
+	// датаграммы уходят в наш же ks0 (туннельный ::/0), читаются обратно
+	// из TUN и пересылаются снова — петля усиления (tunRd 23k за 3с, ~100k
+	// пак/с, просадка Wintun-адаптера). Честный v4-провод лучше взрыва.
+	var w6 *wireV6
+	var wirePool6 *net.IPNet
+	if *peerPool6 != "" {
+		if *peerHost == "" {
+			log.Fatal("fail-closed: -peerpool6 — клиентская роль (нужен -peerhost для v4-отката)")
+		}
+		_, wp, perr := net.ParseCIDR(*peerPool6)
+		if perr != nil {
+			log.Fatalf("fail-closed: -peerpool6 %q: %v", *peerPool6, perr)
+		}
+		// петлестопу пул нужен даже при ВЫКЛЮЧЕННОМ проводе: туннельный
+		// ::/0 поднимает ротация, а пакеты к пулу в туннель входить не должны.
+		wirePool6 = wp
+
+		// пул СЛУЧАЙНЫХ ИСХОДНЫХ адресов (wiresrc6.go).
+		var src6 *srcPool6
+		srcReady := *wire6Src == ""
+		if *wire6Src != "" {
+			if sp, err := newSrcPool6(*wire6Src, ifname, *wire6SrcN, *wire6Rot, datch); err != nil {
+				log.Printf("wire6src: %v", err)
+			} else {
+				src6 = sp
+				srcReady = true
+				cleanups = append(cleanups, sp.close)
+			}
+		}
+		pinned := true
+		if srcReady && rotStarted {
+			pinned = rot.PinWirePool(wirePool6) == nil
+		}
+		switch {
+		case !srcReady:
+			log.Printf("wire6: FAIL-CLOSED: нативного глобального IPv6 у этой машины нет (дамп wire6src выше) — v6-провод НЕ включён: с адреса туннеля его датаграммы ушли бы в сам туннель и породили петлю. Работаем по v4-проводу %s:%d; что делать — в README.txt", *peerHost, *peerPort)
+		case !pinned:
+			log.Printf("wire6: FAIL-CLOSED: пул %s не уведён мимо туннеля (строка v6rot выше) — v6-провод НЕ включён, иначе петля через ks0. Работаем по v4-проводу %s:%d", wirePool6, *peerHost, *peerPort)
+		default:
+			if w, err := newWireV6(*peerPool6, *peerPort, *wire6Rot, datch, src6); err != nil {
+				log.Printf("wire6: %v — v6-провод выключен, остаёмся на v4 (%s:%d)", err, *peerHost, *peerPort)
+			} else {
+				w6 = w
+				cleanups = append(cleanups, w.close)
+			}
+		}
+	}
+
+	if len(cleanups) > 0 {
+		sigc := make(chan os.Signal, 2)
+		signal.Notify(sigc, os.Interrupt)
+		go func() {
+			<-sigc
+			for _, c := range cleanups {
+				c()
+			}
+			os.Exit(0)
+		}()
+	}
+
+	// sendWire — единая точка отправки: у клиента приоритет у v6-провода
+	// (случайный адрес пула ноды на каждую датаграмму); нода отвечает на
+	// выученный lastPeer, для v6-пира — с адреса, на который пришла датаграмма
+	// (pktinfo). v4-путь — как прежде.
+	sendWire := func(wire []byte) {
+		if w6 != nil && w6.ok.Load() {
+			if err := w6.send(wire); err == nil {
+				cSent.Add(1)
+				return
+			}
+			// иначе — откат на v4 ниже
+		}
+		// клиент с v6-проводом в откате: строго v4 (learned v6-адрес пула
+		// устарел и в v4-сокет не пойдёт — стенд поймал: 0/3 после отката)
+		dst := peerWire(*peerHost, *peerPort, w6 != nil)
+		if dst == nil {
+			return // нода ещё не знает клиента — отбросить (TCP выше перешлёт)
+		}
+		if dst.IP.To4() == nil { // v6-пир: отвечаем С hit-адреса пула.
+			// x/net/ipv6: на отправке источник задаётся полем Src (приёмный Dst
+			// в cmsg не маршалится) — иначе ядро молча подставит адрес исходящего
+			// интерфейса (поймал стенд: ответы уходили с veth-адреса, а не с пула).
+			if hit, ok := lastHit6.Load().(net.IP); ok && hit != nil {
+				if _, err := pconn.WriteTo(wire, &ipv6.ControlMessage{Src: hit}, dst); err == nil {
+					cSent.Add(1)
+					return
+				}
+				if cHitFb.Add(1) == 1 {
+					log.Printf("внимание: ответ с hit-адреса %s не ушёл (нужен local-пул на lo + FREEBIND) — отвечаю с адреса туннеля; у клиента со строгим stateful-файрволом ответ может быть отброшен", hit)
+				}
+				if _, err := pconn.WriteTo(wire, nil, dst); err == nil {
+					cSent.Add(1)
+				}
+			}
+			return
+		}
+		if _, err := pconn.WriteTo(wire, nil, dst); err == nil {
+			cSent.Add(1)
+		}
+	}
+
+	// keepalive (только клиентская роль): ICMP echo ноде сквозь туннель каждые
+	// 15с — держит дыры NAT/файрвола открытыми и даёт индикатор канала (lastRx).
+	// Идёт через активный провод (v6, если жив); каждый 4-й — ещё и по v4
+	// напрямую (провод-откат должен оставаться тёплым). Заодно пробует
+	// вернуть v6-провод из отката.
+	var ownTun4, peerTun4 net.IP
+	if ip, _, err := net.ParseCIDR(*tunIP); err == nil {
+		ownTun4 = ip.To4()
+	}
+	if *peerTun != "" {
+		peerTun4 = net.ParseIP(*peerTun).To4()
+	} else if ownTun4 != nil {
+		peerTun4 = net.IPv4(ownTun4[0], ownTun4[1], ownTun4[2], 2) // нода по конвенции .2
+	}
+	if *peerHost != "" && ownTun4 != nil && peerTun4 != nil {
+		go func() {
+			tk := time.NewTicker(15 * time.Second)
+			var seq uint16
+			for range tk.C {
+				seq++
+				tx.TickEpoch(time.Now())
+				wire := tx.Seal(icmpEcho(ownTun4, peerTun4, kaID, seq))
+				if w6 != nil && !w6.ok.Load() {
+					w6.probe(wire) // попытка вернуть v6-провод
+				}
+				sendWire(wire)
+				if seq%4 == 0 && w6 != nil && w6.ok.Load() {
+					// держим v4-дыру NAT тёплой параллельно с v6-проводом
+					if dst := configuredWire(*peerHost, *peerPort); dst != nil {
+						pconn.WriteTo(wire, nil, dst)
+					}
+				}
+			}
+		}()
+	}
+
+	// логгер счётчиков
+	go func() {
+		tk := time.NewTicker(2 * time.Second)
+		for range tk.C {
+			log.Printf("стадии: tunRd=%d sent=%d udpRecv=%d ingestOK=%d dropped=%d tunWr=%d loop=%d lastRx=%s v6=%s провод=%s",
+				cTunRead.Load(), cSent.Load(), cUdpRecv.Load(), cIngestOK.Load(), cDropped.Load(), cTunWrite.Load(), cLoopGuard.Load(), lastRxStr(), v6curStr(), w6.status())
+		}
+	}()
+
+	// приём с провода (v4+v6 на одном сокете; hit — адрес пула из pktinfo)
+	go func() {
+		buf := make([]byte, 2048)
+		for {
+			n, cm, src, err := pconn.ReadFrom(buf)
+			if err != nil {
+				return
+			}
+			ua, ok := src.(*net.UDPAddr)
+			if !ok {
+				continue // не UDP-адрес — не для нас
+			}
+			d := make([]byte, n)
+			copy(d, buf[:n])
+			var hit net.IP
+			if cm != nil && cm.Dst != nil && cm.Dst.To4() == nil {
+				hit = cm.Dst
+			}
+			datch <- inPkt{d, ua, hit}
+		}
+	}()
+
+	// net -> tun
+	go func() {
+		for pkt := range datch {
+			cUdpRecv.Add(1)
+			rx.TickEpoch(time.Now())
+			plain, ok := rx.Ingest(pkt.data)
+			if !ok {
+				cDropped.Add(1) // probe-invisibility: молчим
+				continue
+			}
+			cIngestOK.Add(1)
+			lastRxUnix.Store(time.Now().Unix())
+			if pkt.src != nil {
+				lastPeer.Store(pkt.src) // учим адрес только от валидных датаграмм
+				if pkt.src.IP.To4() == nil && pkt.hit != nil {
+					lastHit6.Store(pkt.hit) // и адрес пула, на который пришли
+				}
+			}
+			if ownTun4 != nil && isKaReply(plain, ownTun4) {
+				continue // наш keepalive-ответ — в TUN не пишем
+			}
+			cTunWrite.Add(1)
+			if _, err := tun.Write(plain); err != nil {
+				log.Printf("tun write: %v", err)
+			}
+		}
+	}()
+
+	// tun -> net
+	buf := make([]byte, 2048)
+	for {
+		n, err := tun.Read(buf)
+		if err != nil {
+			log.Fatalf("tun read: %v", err)
+		}
+		cTunRead.Add(1)
+		// петлестоп: пакеты к проводному IP ноды в туннель НЕ входят — иначе
+		// провод туннеля заглатывает сам себя (полевой взрыв счётчиков 2026-09-01).
+		if loopGuardDrop(buf[:n], peerIP4, wirePool6) {
+			cLoopGuard.Add(1)
+			continue
+		}
+		tx.TickEpoch(time.Now())
+		// packet-aligned: один IP-пакет = одна KS-датаграмма.
+		wire := tx.Seal(buf[:n])
+		sendWire(wire)
+	}
+}
+
+// lastRxStr — читаемый возраст последнего валидного ответа ("15s" / "нет").
+func lastRxStr() string {
+	t := lastRxUnix.Load()
+	if t == 0 {
+		return "нет"
+	}
+	return strconv.Itoa(int(time.Since(time.Unix(t, 0)).Seconds())) + "s"
+}
+
+// peerWire — куда слать по проводу: выученный от валидных датаграмм адрес
+// приоритетнее (нода), иначе сконфигурированный -peerhost (клиент до первого
+// ответа). v4only (клиент с v6-проводом в откате): learned v6-адрес пула
+// пропускаем — он в v4-сокет не встанет, берём конфиг.
+func peerWire(host string, port int, v4only bool) *net.UDPAddr {
+	if v := lastPeer.Load(); v != nil {
+		if a := v.(*net.UDPAddr); !v4only || a.IP.To4() != nil {
+			return a
+		}
+	}
+	return configuredWire(host, port)
+}
+
+// configuredWire — сконфигурированный v4-адрес ноды (-peerhost/-peerport).
+func configuredWire(host string, port int) *net.UDPAddr {
+	if host == "" {
+		return nil
+	}
+	a, err := net.ResolveUDPAddr("udp4", net.JoinHostPort(host, strconv.Itoa(port)))
+	if err != nil {
+		return nil
+	}
+	return a
+}
+
+// loopGuardDrop — петлестоп: пакеты, которые ушли бы в наш же туннель и
+// вернулись обратно, в туннель НЕ входят.
+//
+//  1. v4: пакет к проводному IP ноды (взрыв счётчиков 2026-09-01).
+//  2. v6: пакет к пулу v6-ПРОВОДА ноды. Без этого при туннельном ::/0
+//     и незапиненном пуле датаграммы провода читаются обратно из TUN и
+//     пересылаются снова — петля усиления (поле 14:22 2026-09-04:
+//     tunRd 23k за 3с, ~100k пак/с, просадка Wintun-адаптера).
+func loopGuardDrop(p []byte, peerIP4 net.IP, wirePool6 *net.IPNet) bool {
+	if len(p) < 20 {
+		return false
+	}
+	switch p[0] >> 4 {
+	case 4:
+		return peerIP4 != nil && net.IP(p[16:20]).Equal(peerIP4)
+	case 6:
+		return wirePool6 != nil && len(p) >= 40 && wirePool6.Contains(net.IP(p[24:40]))
+	}
+	return false
+}

@@ -1,0 +1,137 @@
+package chameleon
+
+import (
+	"context"
+	"errors"
+	"time"
+)
+
+// ControlCommand is a low-bandwidth instruction for carrier/profile management.
+type ControlCommand uint8
+
+const (
+	ControlNOOP ControlCommand = iota
+	ControlRotateProfile
+	ControlFetchNodeDirectory
+	ControlSwitchCarrier
+	ControlOpenFlowlet
+	ControlResumeSession
+	ControlEmergencyMailbox
+)
+
+// ControlEnvelope is the common authenticated container carried by experimental
+// control channels. Encryption/signing is intentionally performed by higher
+// session code; channel implementations only move opaque envelopes.
+type ControlEnvelope struct {
+	Version   uint8          `json:"version"`
+	ChannelID string         `json:"channel_id"`
+	Epoch     uint64         `json:"epoch"`
+	Seq       uint64         `json:"seq"`
+	Command   ControlCommand `json:"command"`
+	Payload   []byte         `json:"payload"`
+	AuthTag   []byte         `json:"auth_tag"`
+}
+
+// ControlChannel is a low-bandwidth, best-effort control path. It is not a VPN
+// data plane and must not carry bulk traffic.
+type ControlChannel interface {
+	Name() string
+	Open(ctx context.Context) error
+	Send(ctx context.Context, env ControlEnvelope) error
+	Receive(ctx context.Context) (ControlEnvelope, error)
+	Close() error
+}
+
+// ControlFabric manages multiple optional control channels. The current
+// implementation is intentionally conservative: it provides registration and
+// lifecycle only; all experimental channels are disabled unless explicitly
+// configured by an operator.
+type ControlFabric struct {
+	channels []ControlChannel
+}
+
+func NewControlFabric(channels ...ControlChannel) *ControlFabric {
+	return &ControlFabric{channels: channels}
+}
+
+func (f *ControlFabric) Channels() []ControlChannel {
+	out := make([]ControlChannel, len(f.channels))
+	copy(out, f.channels)
+	return out
+}
+
+func (f *ControlFabric) Open(ctx context.Context) error {
+	for _, ch := range f.channels {
+		if err := ch.Open(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (f *ControlFabric) Close() error {
+	var first error
+	for _, ch := range f.channels {
+		if err := ch.Close(); err != nil && first == nil {
+			first = err
+		}
+	}
+	return first
+}
+
+// CARChannel is a safe placeholder for a Censor-as-Modulator oracle. It is not
+// operational until a lab-safe oracle backend is supplied.
+type CARChannel struct {
+	ProbeDictionary string        `json:"probe_dictionary"`
+	MinInterval     time.Duration `json:"min_interval"`
+}
+
+func (c *CARChannel) Name() string { return "car-censor-modulator" }
+func (c *CARChannel) Open(ctx context.Context) error {
+	return errors.New("CAR channel requires an explicitly configured lab oracle backend")
+}
+func (c *CARChannel) Send(ctx context.Context, env ControlEnvelope) error {
+	return errors.New("CAR channel backend is not configured")
+}
+func (c *CARChannel) Receive(ctx context.Context) (ControlEnvelope, error) {
+	return ControlEnvelope{}, errors.New("CAR channel backend is not configured")
+}
+func (c *CARChannel) Close() error { return nil }
+
+// BGPControlChannel is a safe placeholder. It must only be wired to private lab
+// BGP or operator-authorized routing infrastructure.
+type BGPControlChannel struct {
+	ReaderEndpoint string        `json:"reader_endpoint"`
+	MinInterval    time.Duration `json:"min_interval"`
+}
+
+func (b *BGPControlChannel) Name() string { return "bgp-control-plane" }
+func (b *BGPControlChannel) Open(ctx context.Context) error {
+	return errors.New("BGP control channel requires authorized routing infrastructure")
+}
+func (b *BGPControlChannel) Send(ctx context.Context, env ControlEnvelope) error {
+	return errors.New("BGP control channel backend is not configured")
+}
+func (b *BGPControlChannel) Receive(ctx context.Context) (ControlEnvelope, error) {
+	return ControlEnvelope{}, errors.New("BGP control channel backend is not configured")
+}
+func (b *BGPControlChannel) Close() error { return nil }
+
+// CDNCacheStateChannel is a safe placeholder for an owned/authorized cache-state
+// board. It is intended for control envelopes only.
+type CDNCacheStateChannel struct {
+	BoardURL    string        `json:"board_url"`
+	MinInterval time.Duration `json:"min_interval"`
+}
+
+func (c *CDNCacheStateChannel) Name() string { return "cdn-cache-state-board" }
+func (c *CDNCacheStateChannel) Open(ctx context.Context) error {
+	return errors.New("CDN cache-state channel requires an authorized board backend")
+}
+func (c *CDNCacheStateChannel) Send(ctx context.Context, env ControlEnvelope) error {
+	return errors.New("CDN cache-state channel backend is not configured")
+}
+func (c *CDNCacheStateChannel) Receive(ctx context.Context) (ControlEnvelope, error) {
+	return ControlEnvelope{}, errors.New("CDN cache-state channel backend is not configured")
+}
+func (c *CDNCacheStateChannel) Close() error { return nil }

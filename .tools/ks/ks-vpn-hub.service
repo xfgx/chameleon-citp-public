@@ -1,0 +1,21 @@
+[Unit]
+Description=KS VPN multi-user hub (ks-hub, :51830)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+RuntimeDirectory=ks-hub
+RuntimeDirectoryMode=0750
+ExecStartPre=/bin/mkdir -p /root/build/users
+ExecStartPre=/bin/chmod 700 /root/build/users
+ExecStart=/root/build/ks-hub -keydir /root/build/users -tun kshub0 -innerself 10.99.9.2/24 -listen 51830 -T 8 -workers 0 -idle 300 -maxusers 64 -allowpeers=false -status /run/ks-hub/status.json -outdir n2c -indir c2n
+ExecStartPost=/root/build/ks-hub-net.sh up
+ExecStopPost=/root/build/ks-hub-net.sh down
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=2
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

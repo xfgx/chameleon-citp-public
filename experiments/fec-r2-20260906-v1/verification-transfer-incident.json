@@ -1,0 +1,8 @@
+{
+  "type": "verifier_source_transfer_mismatch",
+  "missing_fragment": ",len(larger)",
+  "experimental_source_or_raw_modified": false,
+  "original_transfer_sha256": "e268182af568639b1db6e85502b9a09006630ad8c25c43c90f1a5649c886f4b5",
+  "restored_verified_source_sha256": "0af734ecd6f9812ce0e357aa5450151545eb706b256923cac9f88b8c5ef8236c",
+  "old_verifier_and_first_audit_preserved": true
+}

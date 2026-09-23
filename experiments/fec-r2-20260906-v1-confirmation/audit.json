@@ -1,0 +1,12 @@
+{
+  "code_sha256": "eea8786556a81e14d8035273bf9178cfaea48a2067a743e3a13d5f3e7df14004",
+  "core_environment_unchanged": true,
+  "listener_closed": true,
+  "management_channel_carried_source_symbols": false,
+  "protocol_sha256": "411963afecb59c6960ad676aaf35330d60ab153bf562d014dee0afc2cb25c6e0",
+  "raw_mcp_sha256": "45532d62a416e0c2c2bf45ff8571da568e5acc3ada641421eef3f293a2d6f22f",
+  "raw_ru_sha256": "ee5387b6afc3055153ec7a48ac63fc1d2651e8f7dadf0ae2717324934c3d614f",
+  "remote_artifact_directory": "/tmp/fec-r2-20260906-v1-confirmation",
+  "server_exit": 0,
+  "test_transport": "separate TCP connection; addresses visible; application framing bytes are not all on-wire bytes"
+}

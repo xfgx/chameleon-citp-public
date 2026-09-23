@@ -1,0 +1,18 @@
+[Unit]
+Description=Chameleon KS-VPN phone peer (ksphone0)
+After=network-online.target ks-vpn-exit.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/build
+ExecStartPre=/bin/sh -c 'sysctl -w net.ipv4.ip_forward=1 >/dev/null; nft add table ip ks_nat 2>/dev/null || true; nft add chain ip ks_nat post "{ type nat hook postrouting priority srcnat; }" 2>/dev/null || true; nft add rule ip ks_nat post ip saddr 10.99.1.0/24 oifname ks1 masquerade 2>/dev/null || true; nft add rule ip ks_nat post ip saddr 10.99.1.0/24 oifname ens3 masquerade 2>/dev/null || true'
+ExecStart=/root/build/ks-vpn -keyfile /root/build/ks-phone.key -tun ksphone0 -tunip 10.99.1.2/24 -peerport 23501 -listen 51822 -outdir n2c -indir c2n -T 8
+ExecStartPost=/bin/sh -c 'ip rule add pref 101 iif ksphone0 lookup 100 2>/dev/null || true'
+ExecStopPost=/bin/sh -c 'ip rule del pref 101 iif ksphone0 lookup 100 2>/dev/null || true'
+Restart=always
+RestartSec=3
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

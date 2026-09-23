@@ -1,0 +1,56 @@
+{
+  "suites": {
+    "tests.jsonl": {
+      "root_passes": 11,
+      "subtest_passes": 9,
+      "failures": 0,
+      "package_pass": true
+    },
+    "race-tests.jsonl": {
+      "root_passes": 33,
+      "subtest_passes": 27,
+      "failures": 0,
+      "package_pass": true
+    }
+  },
+  "routed_case_count": 8,
+  "routed_cases_passed": 8,
+  "positive_responses": 9,
+  "capture": {
+    "ipv6_packets": 139,
+    "tcp_packets": 135,
+    "protected_primary_packets": 0,
+    "scope": "all IPv6 on the isolated client-router link",
+    "sha256": "4cd4f7c88a9edf9444cf16b24d535f459dea341174c79ef866fa4724b24bc6b1",
+    "seen_addresses": [
+      "2001:db8:100::1",
+      "2001:db8:100::2",
+      "2001:db8:300:0:1988:d6d8:4dc0:c2bc",
+      "2001:db8:300:0:198e:5b25:680:acd",
+      "2001:db8:300:0:32f1:ea8b:e7ea:73cd",
+      "2001:db8:300:0:3b2f:8258:2cc7:23ba",
+      "2001:db8:300:0:5217:4d3f:18f1:4c15",
+      "2001:db8:300:0:6d98:eeb7:614b:a58f",
+      "2001:db8:300:0:7345:dd12:8ac0:ae81",
+      "2001:db8:300:0:7da2:91f7:c5af:d915",
+      "2001:db8:300:0:d08:f947:330b:e328",
+      "fe80::34ac:e8ff:fed3:7ee8",
+      "ff02::1:ff00:1",
+      "ff02::2"
+    ]
+  },
+  "health": {
+    "routes4_unchanged": true,
+    "routes6_unchanged": true,
+    "rules4_unchanged": true,
+    "rules6_unchanged": true,
+    "nft_unchanged": true,
+    "netns_unchanged": true,
+    "services_unchanged": true
+  },
+  "vet_log_bytes": 0,
+  "initial_guard_refusal_preserved": true,
+  "short_timeout_failure_preserved": true,
+  "windows_executed": false,
+  "internet_goal_achieved": false
+}

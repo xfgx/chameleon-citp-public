@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ChameleonVPN" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#8B5CF6</item>
+        <item name="colorOnPrimary">#0B0B0D</item>
+        <item name="colorSecondary">#60A5FA</item>
+        <item name="colorOnSecondary">#0B0B0D</item>
+        <item name="android:colorBackground">#0B0B0D</item>
+        <item name="colorSurface">#151518</item>
+        <item name="colorOnSurface">#FAFAFA</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#0B0B0D</item>
+        <item name="android:navigationBarColor">#0B0B0D</item>
+    </style>
+</resources>

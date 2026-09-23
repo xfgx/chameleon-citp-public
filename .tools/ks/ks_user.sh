@@ -1,0 +1,156 @@
+#!/bin/bash
+# ks_user.sh - провижининг пользователей многопользовательского хаба KS (ks-hub, :51830).
+#   add <имя>     - создать пользователя и выдать код доступа
+#   del <имя>     - удалить пользователя (мгновенный отзыв доступа)
+#   code <имя>    - показать код доступа (для телефона)
+#   bundle <имя>  - собрать персональный Windows-комплект
+#   list          - кто выдан и что видит хаб
+set -u
+PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export PATH
+
+KEYDIR="${KEYDIR:-/root/build/users}"
+KSVPN="${KSVPN:-/root/build/ks-vpn}"
+NODE_IP="${NODE_IP:-192.0.2.10}"
+HUB_PORT="${HUB_PORT:-51830}"
+NET3="${NET3:-10.99.9}"
+V6BASE="${V6BASE:-2001:db8:1}"
+V6ROT="${V6ROT:-300}"
+STATUS="${STATUS:-/run/ks-hub/status.json}"
+BUNDLE_SRC="${BUNDLE_SRC:-/root/dist/ks-windows-client-CURRENT.tar.gz}"
+OUTDIR="${OUTDIR:-/root/dist/users}"
+SLOT_MIN=11
+SLOT_MAX=250
+UNIT=ks-vpn-hub
+
+die() { echo "ОШИБКА: $*" >&2; exit 1; }
+
+need_name() {
+  [ -n "${1:-}" ] || die "нужно имя пользователя"
+  echo "$1" | grep -qE '^[a-z0-9][a-z0-9_-]{0,23}$' || die "имя '$1': только a-z 0-9 _ - (1..24, начинается с буквы/цифры)"
+}
+
+find_file() { ls -1 "$KEYDIR" 2>/dev/null | grep -E "^[0-9]{3}-$1\.key$" | head -1; }
+
+slot_of() { echo "$1" | cut -d- -f1 | sed 's/^0*//'; }
+
+v6prefix_of() { printf '%s:%04x::/64' "$V6BASE" "$1"; }
+
+reload_hub() {
+  if systemctl is-active --quiet "$UNIT" 2>/dev/null; then
+    if systemctl reload "$UNIT" 2>/dev/null; then echo "хаб: состав перечитан (systemctl reload)"; return 0; fi
+  fi
+  if pkill -HUP -x ks-hub 2>/dev/null; then echo "хаб: состав перечитан (SIGHUP)"; else echo "хаб не запущен - состав прочитается при старте"; fi
+}
+
+cmd_code() {
+  need_name "${1:-}"
+  local base slot key
+  base="$(find_file "$1")"; [ -n "$base" ] || die "пользователя '$1' нет"
+  slot="$(slot_of "$base")"
+  v6="$(v6prefix_of "$slot")"
+  key="$(tr -d ' \t\r\n' < "$KEYDIR/$base")"
+  echo
+  echo "=== КОД ДОСТУПА '$1' (телефон: Настройки -> Код доступа) ==="
+  echo "ks1:$NODE_IP:$HUB_PORT:$NET3.$slot:$key"
+  echo "IPv6-пул клиента: $v6 (назначается автоматически внутри VPN)"
+  echo "=== ПК: $0 bundle $1 ==="
+  echo
+}
+
+cmd_add() {
+  need_name "${1:-}"
+  local name="$1" f slot o
+  mkdir -p "$KEYDIR"; chmod 700 "$KEYDIR"
+  [ -z "$(find_file "$name")" ] || die "пользователь '$name' уже есть ($0 code $name)"
+  [ -x "$KSVPN" ] || die "нет генератора ключей $KSVPN"
+  slot=""
+  for o in $(seq "$SLOT_MIN" "$SLOT_MAX"); do
+    if ! ls -1 "$KEYDIR" 2>/dev/null | grep -qE "^0*$o-"; then slot="$o"; break; fi
+  done
+  [ -n "$slot" ] || die "свободных адресов нет ($NET3.$SLOT_MIN..$NET3.$SLOT_MAX)"
+  f="$KEYDIR/$(printf '%03d' "$slot")-$name.key"
+  "$KSVPN" -keyfile "$f" -genkey >/dev/null 2>&1 || die "не удалось сгенерировать ключ ($KSVPN -genkey)"
+  [ -s "$f" ] || die "ключ $f пуст"
+  chmod 600 "$f"
+  echo "создан пользователь '$name': внутренний адрес $NET3.$slot, IPv6-пул $(v6prefix_of "$slot"), ключ $f"
+  reload_hub
+  cmd_code "$name"
+}
+
+cmd_del() {
+  need_name "${1:-}"
+  local base
+  base="$(find_file "$1")"; [ -n "$base" ] || die "пользователя '$1' нет"
+  rm -f "$KEYDIR/$base"
+  rm -rf "$OUTDIR/$1"
+  echo "удалён пользователь '$1' (был ключ $base)"
+  reload_hub
+}
+
+cmd_list() {
+  local b o n
+  echo "=== выданные доступы ($KEYDIR) ==="
+  ls -1 "$KEYDIR" 2>/dev/null | grep -E '^[0-9]{3}-.*\.key$' | while read -r b; do
+    o="$(slot_of "$b")"; n="${b#*-}"; n="${n%.key}"
+    printf '  %-24s %s.%s  v6=%s\n' "$n" "$NET3" "$o" "$(v6prefix_of "$o")"
+  done
+  echo "=== состояние хаба ($STATUS) ==="
+  if [ -r "$STATUS" ]; then
+    python3 -m json.tool "$STATUS" 2>/dev/null || cat "$STATUS"
+  else
+    echo "  статуса нет (хаб не запущен?)"
+  fi
+}
+
+cmd_bundle() {
+  need_name "${1:-}"
+  local name="$1" base slot v6 tmp root dst key
+  base="$(find_file "$name")"; [ -n "$base" ] || die "пользователя '$name' нет"
+  slot="$(slot_of "$base")"
+  v6="$(v6prefix_of "$slot")"
+  [ -r "$BUNDLE_SRC" ] || die "нет исходного комплекта $BUNDLE_SRC"
+  tmp="$(mktemp -d)" || die "mktemp"
+  tar -xzf "$BUNDLE_SRC" -C "$tmp" || { rm -rf "$tmp"; die "распаковка не удалась"; }
+  root="$(find "$tmp" -maxdepth 2 -name 'ks-vpn-windows-amd64.exe' -printf '%h\n' 2>/dev/null | head -1)"
+  [ -n "$root" ] || { rm -rf "$tmp"; die "в комплекте нет ks-vpn-windows-amd64.exe"; }
+  key="$(tr -d ' \t\r\n' < "$KEYDIR/$base")"
+  mkdir -p "$root/data"
+  printf '%s\n' "$key" > "$root/data/ks-vpn.key"
+  chmod 600 "$root/data/ks-vpn.key"
+  printf '%s\r\n' \
+    '@echo off' \
+    'chcp 65001 >nul' \
+    'cd /d %~dp0' \
+    "echo KS-VPN multi-user: TUN $NET3.$slot -^> hub $NODE_IP:$HUB_PORT (user: $name)" \
+    'echo Run this file AS ADMINISTRATOR. Ctrl+C removes all routes back.' \
+    "echo IPv6 is assigned automatically from $v6 and carried inside the VPN." \
+    'echo.' \
+    "ks-vpn-windows-amd64.exe -tunip $NET3.$slot/24 -peerhost $NODE_IP -peerport $HUB_PORT -listen 23500 -keyfile data\\ks-vpn.key -fulltun -tunv6 -v6prefix $v6 -v6rot $V6ROT" \
+    'pause' > "$root/run-ks-vpn.bat"
+  {
+    echo
+    echo "--- ПЕРСОНАЛЬНЫЙ КОМПЛЕКТ ($name) ---"
+    echo "Внутренний адрес: $NET3.$slot   IPv6-пул: $v6   Хаб: $NODE_IP:$HUB_PORT"
+    echo "Ключ в data\\ks-vpn.key уникален для этого пользователя - никому не передавать."
+    echo "На хабе клиенты изолированы друг от друга; в этой версии только IPv4-провод."
+  } >> "$root/README.txt" 2>/dev/null || true
+  ( cd "$root" && sha256sum ks-vpn-windows-amd64.exe wintun.dll run-ks-vpn.bat chaossync-selftest-windows-amd64.exe > SHA256SUMS 2>/dev/null ) || true
+  dst="$OUTDIR/$name"
+  mkdir -p "$dst"; chmod 700 "$OUTDIR" "$dst"
+  ( cd "$(dirname "$root")" && mv "$(basename "$root")" "ks-windows-$name" && tar -czf "$dst/ks-windows-$name.tar.gz" "ks-windows-$name" ) || { rm -rf "$tmp"; die "упаковка не удалась"; }
+  chmod 600 "$dst/ks-windows-$name.tar.gz"
+  rm -rf "$tmp"
+  echo "персональный ПК-комплект готов:"
+  sha256sum "$dst/ks-windows-$name.tar.gz"
+  echo "забрать: scp -i <ключ> root@$NODE_IP:$dst/ks-windows-$name.tar.gz ."
+}
+
+case "${1:-}" in
+  add)    shift; cmd_add "${1:-}" ;;
+  del)    shift; cmd_del "${1:-}" ;;
+  code)   shift; cmd_code "${1:-}" ;;
+  bundle) shift; cmd_bundle "${1:-}" ;;
+  list)   cmd_list ;;
+  *) echo "usage: $0 add|del|code|bundle <имя> | list" >&2; exit 2 ;;
+esac

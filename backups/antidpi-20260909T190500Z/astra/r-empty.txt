@@ -1,0 +1,10 @@
+@V s01 := [0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50, 0.50]
+@G norm := 0.00; top := t01+, t02+, t03+; neutral_axes := 12
+@WHY
+@BACK
+  Выраженные признаки по всем осям отсутствуют; содержание не восстанавливается.
+@FLAGS
+  EMPTY_INPUT
+
+CHECK s01 FAIL :: dims=11 (expected 12)
+USAGE prompt=3747 completion=158 total=3905 reasoning=34

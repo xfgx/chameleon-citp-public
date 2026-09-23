@@ -1,0 +1,9 @@
+name = "cham-bridge"
+main = "worker.js"
+compatibility_date = "2026-08-01"
+
+# Нода: путь /b/<токен> обязан совпадать с токеном ws-фронта ноды
+# (журнал cham-server: «ws-фронт: слушаю …, путь /b/<токен>»).
+[vars]
+NODE_WS_URL = "ws://192.0.2.10:9446/b/a2501402d262723b21e8a835"
+BRIDGE_TOKEN = "<REDACTED>"

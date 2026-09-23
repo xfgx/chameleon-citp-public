@@ -1,0 +1,55 @@
+{
+  "scope": "isolated routed IPv6 on RU, NOT MCP-to-RU Internet",
+  "clock": "injected epochs 100 and 101, not a wall-clock rotation daemon",
+  "cases": [
+    {
+      "case": "initial",
+      "requested": 3,
+      "application_probes": 3,
+      "successful": 1,
+      "expected": 3,
+      "returncode": 2,
+      "dialed": [
+        "[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443",
+        "[2001:db8:300:0:1498:3456:4de1:c283]:24443",
+        "[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443",
+        "[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443",
+        "[2001:db8:300:0:1498:3456:4de1:c283]:24443",
+        "[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443",
+        "[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443",
+        "[2001:db8:300:0:1498:3456:4de1:c283]:24443",
+        "[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443"
+      ],
+      "connected": [
+        "[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443"
+      ],
+      "authentication_rejections": 0,
+      "primary_dialed": false,
+      "passed": false
+    }
+  ],
+  "independent_plans_match": true,
+  "plans": {
+    "epoch100": {
+      "epoch": 100,
+      "endpoints": [
+        "[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443",
+        "[2001:db8:300:0:1498:3456:4de1:c283]:24443",
+        "[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443"
+      ],
+      "network_action": "none: computation only"
+    },
+    "epoch101": {
+      "epoch": 101,
+      "endpoints": [
+        "[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443",
+        "[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443",
+        "[2001:db8:300:0:6229:6569:a5dd:b89a]:24443"
+      ],
+      "network_action": "none: computation only"
+    }
+  },
+  "overall_pass": false,
+  "error": "AssertionError({'case': 'initial', 'requested': 3, 'application_probes': 3, 'successful': 1, 'expected': 3, 'returncode': 2, 'dialed': ['[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443', '[2001:db8:300:0:1498:3456:4de1:c283]:24443', '[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443', '[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443', '[2001:db8:300:0:1498:3456:4de1:c283]:24443', '[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443', '[2001:db8:300:0:3bf0:b7f5:3eab:15b9]:24443', '[2001:db8:300:0:1498:3456:4de1:c283]:24443', '[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443'], 'connected': ['[2001:db8:300:0:2ff0:c2ae:3a5c:6632]:24443'], 'authentication_rejections': 0, 'primary_dialed': False, 'passed': False})",
+  "private_keys_removed": true
+}

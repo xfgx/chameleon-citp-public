@@ -1,0 +1,11 @@
+{"event":"dial","endpoint":"192.0.2.11:443","time":"2026-09-05T10:59:36.373010154Z"}
+{"event":"authentication_failed","endpoint":"192.0.2.11:443","detail":"tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2026-09-05T10:59:36Z is after 2026-04-24T20:04:45Z","time":"2026-09-05T10:59:36.532587073Z"}
+{"event":"probe_failed","sequence":1,"detail":"all explicit endpoints unavailable: fail closed","time":"2026-09-05T10:59:36.533019026Z"}
+{"event":"dial","endpoint":"192.0.2.11:443","time":"2026-09-05T10:59:36.633323527Z"}
+{"event":"authentication_failed","endpoint":"192.0.2.11:443","detail":"tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2026-09-05T10:59:36Z is after 2026-04-24T20:04:45Z","time":"2026-09-05T10:59:36.79131568Z"}
+{"event":"probe_failed","sequence":2,"detail":"all explicit endpoints unavailable: fail closed","time":"2026-09-05T10:59:36.791347739Z"}
+{"event":"dial","endpoint":"192.0.2.11:443","time":"2026-09-05T10:59:36.891656015Z"}
+{"event":"authentication_failed","endpoint":"192.0.2.11:443","detail":"tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2026-09-05T10:59:37Z is after 2026-04-24T20:04:45Z","time":"2026-09-05T10:59:37.053834776Z"}
+{"event":"probe_failed","sequence":3,"detail":"all explicit endpoints unavailable: fail closed","time":"2026-09-05T10:59:37.053859031Z"}
+{"event":"summary","sequence":3,"detail":"success=0 attempted=3","time":"2026-09-05T10:59:37.053867584Z"}
+{"event":"fatal","detail":"one or more probes failed","time":"2026-09-05T10:59:37.053872622Z"}

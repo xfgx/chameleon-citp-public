@@ -1,0 +1,37 @@
+{
+  "routes4": {
+    "rc": 0,
+    "stdout": "default via 10.98.0.2 dev ks1 table 100 metric 1 \nblackhole default table 100 metric 1000 \ndefault via 192.0.2.1 dev ens3 proto static \n10.98.0.0/24 dev ks1 proto kernel scope link src 10.98.0.1 \n10.99.0.0/24 dev ks0 proto kernel scope link src 10.99.0.2 \n10.99.1.0/24 dev ksphone0 proto kernel scope link src 10.99.1.2 \n10.99.9.0/24 dev kshub0 proto kernel scope link src 10.99.9.2 \n192.0.2.0/24 dev ens3 proto kernel scope link src 192.0.2.10 \nlocal 10.98.0.1 dev ks1 table local proto kernel scope host src 10.98.0.1 \nbroadcast 10.98.0.255 dev ks1 table local proto kernel scope link src 10.98.0.1 \nlocal 10.99.0.2 dev ks0 table local proto kernel scope host src 10.99.0.2 \nbroadcast 10.99.0.255 dev ks0 table local proto kernel scope link src 10.99.0.2 \nlocal 10.99.1.2 dev ksphone0 table local proto kernel scope host src 10.99.1.2 \nbroadcast 10.99.1.255 dev ksphone0 table local proto kernel scope link src 10.99.1.2 \nlocal 10.99.9.2 dev kshub0 table local proto kernel scope host src 10.99.9.2 \nbroadcast 10.99.9.255 dev kshub0 table local proto kernel scope link src 10.99.9.2 \nlocal 192.0.2.10 dev ens3 table local proto kernel scope host src 192.0.2.10 \nlocal 192.0.2.11 dev ens3 table local proto kernel scope host src 192.0.2.10 \nbroadcast 192.0.2.255 dev ens3 table local proto kernel scope link src 192.0.2.10 \nlocal 127.0.0.0/8 dev lo table local proto kernel scope host src 127.0.0.1 \nlocal 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1 \nbroadcast 127.255.255.255 dev lo table local proto kernel scope link src 127.0.0.1 \n",
+    "stderr": ""
+  },
+  "routes6": {
+    "rc": 0,
+    "stdout": "default dev ks1 table 100 metric 1 pref medium\nblackhole default dev lo table 100 metric 1000 pref medium\ndefault dev he6in4ru table 101 metric 1024 pref medium\n2001:db8:1::/48 dev ks0 metric 1024 pref medium\n2001:db8:2::/64 dev he6in4ru proto kernel metric 256 pref medium\nfe80::/64 dev ens3 proto kernel metric 256 pref medium\nfe80::/64 dev ks1 proto kernel metric 256 pref medium\nfe80::/64 dev he6in4ru proto kernel metric 256 pref medium\nfe80::/64 dev ks0 proto kernel metric 256 pref medium\ndefault dev he6in4ru metric 1024 pref medium\nlocal ::1 dev lo table local proto kernel metric 0 pref medium\nanycast 2001:db8:2:: dev he6in4ru table local proto kernel metric 0 pref medium\nlocal 2001:db8:2::2 dev he6in4ru table local proto kernel metric 0 pref medium\nlocal 2001:db8:2::/48 dev lo table local metric 1024 pref medium\nanycast fe80:: dev ens3 table local proto kernel metric 0 pref medium\nanycast fe80:: dev ks1 table local proto kernel metric 0 pref medium\nanycast fe80:: dev he6in4ru table local proto kernel metric 0 pref medium\nanycast fe80:: dev ks0 table local proto kernel metric 0 pref medium\nlocal fe80::2d5a:d8c1 dev he6in4ru table local proto kernel metric 0 pref medium\nlocal fe80::3e1:750a:b73b:60f0 dev ks0 table local proto kernel metric 0 pref medium\nlocal fe80::446f:e0a5:b3d6:54f dev ks1 table local proto kernel metric 0 pref medium\nlocal fe80::5054:ff:fee0:5f9b dev ens3 table local proto kernel metric 0 pref medium\nmulticast ff00::/8 dev ens3 table local proto kernel metric 256 pref medium\nmulticast ff00::/8 dev ks1 table local proto kernel metric 256 pref medium\nmulticast ff00::/8 dev he6in4ru table local proto kernel metric 256 pref medium\nmulticast ff00::/8 dev ks0 table local proto kernel metric 256 pref medium\n",
+    "stderr": ""
+  },
+  "rules4": {
+    "rc": 0,
+    "stdout": "0:\tfrom all lookup local\n99:\tfrom all to 192.0.2.10 iif ks0 lookup main\n100:\tfrom all iif ks0 lookup 100\n101:\tfrom all iif ksphone0 lookup 100\n102:\tfrom all to 192.0.2.10 iif kshub0 lookup main\n103:\tfrom all iif kshub0 lookup 100\n32766:\tfrom all lookup main\n32767:\tfrom all lookup default\n",
+    "stderr": ""
+  },
+  "rules6": {
+    "rc": 0,
+    "stdout": "0:\tfrom all lookup local\n50:\tfrom 2001:db8:2::/48 to 2001:db8:1::/48 lookup 101\n100:\tfrom all iif ks0 lookup 100\n32766:\tfrom all lookup main\n",
+    "stderr": ""
+  },
+  "nft": {
+    "rc": 0,
+    "stdout": "table ip ks_nat {\n\tchain post {\n\t\ttype nat hook postrouting priority srcnat; policy accept;\n\t\tip saddr 10.99.0.0/24 oifname \"ks1\" counter masquerade\n\t\tip saddr 10.99.0.0/24 oifname \"ens3\" masquerade\n\t\tip saddr 10.99.1.0/24 oifname \"ks1\" masquerade\n\t\tip saddr 10.99.1.0/24 oifname \"ens3\" masquerade\n\t\tip saddr 10.99.9.0/24 oifname \"ks1\" masquerade\n\t\tip saddr 10.99.9.0/24 oifname \"ens3\" masquerade\n\t}\n}\ntable ip6 ks6g {\n\tchain guard6 {\n\t\ttype filter hook forward priority filter; policy accept;\n\t\tiifname \"ks0\" ip6 saddr != 2001:db8:1::/48 counter drop\n\t}\n}\n",
+    "stderr": ""
+  },
+  "netns": {
+    "rc": 0,
+    "stdout": "A (id: 0)\nB (id: 1)\n",
+    "stderr": ""
+  },
+  "services": {
+    "rc": 0,
+    "stdout": "MainPID=700590\nNRestarts=0\nId=ks-admin.service\nActiveState=active\n\nMainPID=650485\nNRestarts=0\nId=ks-vpn-hub.service\nActiveState=active\n\nMainPID=631978\nNRestarts=0\nId=ks-vpn-node.service\nActiveState=active\n\nMainPID=644057\nNRestarts=0\nId=ks-vpn-phone.service\nActiveState=active\n\nMainPID=629181\nNRestarts=0\nId=ks-vpn-exit.service\nActiveState=active\n\nMainPID=136778\nNRestarts=0\nId=cham-server.service\nActiveState=active\n\nMainPID=632172\nNRestarts=1\nId=chaossync-server.service\nActiveState=active\n",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,21 @@
+[Unit]
+Description=KS-VPN admin panel (statistics only, no traffic payload)
+Documentation=file:///root/vpn/docs/KS.md
+After=network-online.target ks-vpn-hub.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=KS_ADMIN_IP=192.0.2.10,192.0.2.11
+ExecStart=/root/build/ks-admin -listen :51843 -conf /root/build/ks-admin.conf -datadir /var/lib/ks-admin -hub /run/ks-hub/status.json -units ks-vpn-hub,ks-vpn-node,ks-vpn-phone,ks-vpn-exit -ifaces kshub0,ks0,ksphone0,ks1 -interval 5 -jinterval 15 -persist 60 -hist 720 -maxlog 16 -tls=true
+Restart=always
+RestartSec=3
+StateDirectory=ks-admin
+StateDirectoryMode=0750
+LimitNOFILE=65535
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

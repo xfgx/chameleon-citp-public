@@ -1,0 +1,206 @@
+# GPT-6 Astra: изучение репозитория /files/VPN — 2026-09-09
+
+## Трек A — TEXTVEC-геометрия документов
+
+DOCS 10
+id   file                                             norm top3
+b01  docs/KS.md                                       0.92 t05+,t09-,t11+
+b02  docs/CHAOSSYNC.md                                0.98 t11+,t05+,t07+
+b03  docs/CITP-V3-PHANTOM-TTLS.md                     0.96 t05+,t07+,t09-
+b04  docs/ROADMAP-CENSOR-TRANSPORT.md                 0.88 t05+,t08+,t11+
+b05  docs/CHAOS-METRICS.md                            1.02 t05+,t11+,t07+
+b06  docs/NODE_DEPLOYMENT.md                          1.13 t05+,t09+,t07+
+b07  docs/KS-RESEARCH.md                              1.04 t05+,t11+,t09-
+b08  skills/SKILL.md                                  0.90 t09+,t03+,t05+
+b09  skills/references/honest-measurement.md          0.83 t09+,t07+,t03+
+b10  skills/references/open-fronts.md                 0.85 t05+,t11+,t10-
+
+DISTANCE MATRIX (euclidean, 12D)
+       b01   b02   b03   b04   b05   b06   b07   b08   b09   b10
+b01   0.00  0.35  0.12  0.56  0.27  1.04  0.25  0.97  1.16  0.82
+b02   0.35  0.00  0.28  0.49  0.23  1.21  0.40  0.94  1.20  0.75
+b03   0.12  0.28  0.00  0.51  0.23  1.06  0.27  0.95  1.17  0.79
+b04   0.56  0.49  0.51  0.00  0.62  1.03  0.68  0.68  1.02  0.61
+b05   0.27  0.23  0.23  0.62  0.00  1.16  0.22  1.01  1.22  0.81
+b06   1.04  1.21  1.06  1.03  1.16  0.00  1.06  0.80  0.77  0.98
+b07   0.25  0.40  0.27  0.68  0.22  1.06  0.00  1.07  1.20  0.90
+b08   0.97  0.94  0.95  0.68  1.01  0.80  1.07  0.00  0.75  0.53
+b09   1.16  1.20  1.17  1.02  1.22  0.77  1.20  0.75  0.00  0.94
+b10   0.82  0.75  0.79  0.61  0.81  0.98  0.90  0.53  0.94  0.00
+
+CLOSEST PAIRS
+  b01 ~ b03  distance=0.12 cosine=0.992
+  b05 ~ b07  distance=0.22 cosine=0.977
+  b02 ~ b05  distance=0.23 cosine=0.973
+  b03 ~ b05  distance=0.23 cosine=0.974
+FARTHEST PAIRS
+  b05 ~ b09  distance=1.22 cosine=0.136
+  b02 ~ b06  distance=1.21 cosine=0.354
+  b07 ~ b09  distance=1.20 cosine=0.185
+  b02 ~ b09  distance=1.20 cosine=0.131
+
+AXIS PROFILE ACROSS DOCS
+axis             min  mean   max spread
+t01 valence     0.50  0.51  0.55   0.05
+t02 arousal     0.20  0.29  0.45   0.25
+t03 dominance   0.65  0.71  0.85   0.20
+t04 concreteness  0.35  0.54  0.85   0.50
+t05 specificity  0.40  0.86  0.95   0.55
+t06 formality   0.40  0.66  0.80   0.40
+t07 certainty   0.65  0.84  0.90   0.25
+t08 temporality  0.35  0.57  0.85   0.50
+t09 agency      0.10  0.44  0.95   0.85
+t10 subjectivity  0.10  0.20  0.35   0.25
+t11 complexity  0.55  0.85  0.95   0.40
+t12 novelty     0.15  0.61  0.85   0.70
+
+DISTANCE TO CENTROID (higher = more atypical doc)
+  b09  skills/references/honest-measurement.md        0.84
+  b06  docs/NODE_DEPLOYMENT.md                        0.79
+  b08  skills/SKILL.md                                0.62
+  b10  skills/references/open-fronts.md               0.52
+  b07  docs/KS-RESEARCH.md                            0.48
+  b05  docs/CHAOS-METRICS.md                          0.46
+  b02  docs/CHAOSSYNC.md                              0.44
+  b01  docs/KS.md                                     0.39
+  b04  docs/ROADMAP-CENSOR-TRANSPORT.md               0.39
+  b03  docs/CITP-V3-PHANTOM-TTLS.md                   0.38
+
+## Трек B — разбор по дайджесту
+
+STATUS finish_reason=stop
+USAGE prompt=81307 completion=16355 total=97662 reasoning=5972
+1. КАРТА.
+
+- `cmd/cham-server/main.go` → серверный рантайм Chameleon: TCP-слушатель, загрузка ключа и allowlist, конфигурация egress policy, подключение Control Fabric, upstream-каскада, WS- и TTLS-фронтов → вызовы `internal/chameleon`, `net`, `net/http`. Это продакшн-точка входа по `docs/NODE_DEPLOYMENT.md`; однако `main.go` усечён перед реализацией strike-list и обработчика сеанса, поэтому аутентификацию, policy enforcement и blackhole по этому срезу проверить нельзя.
+- `cmd/chamd/main.go` → клиентский демон с настройками UI, SOCKS5, TUN, DNS и автопилота → остальной пакет `cmd/chamd`. Продакшн-клиент по `docs/NODE_DEPLOYMENT.md`, но видимая часть обрывается на объявлениях флагов: фактический запуск служб и изменение системных маршрутов не показаны.
+- `cmd/chamd/autopilot.go` → исследовательские механизмы, включаемые в клиентский рантайм: профилирование, выбор локальной стратегии, опрос борда, журнал наблюдений, поля surrogate/canary/leak budget → `Manager`, `Cover`, `internal/chameleon`. Видны `profileAndApply`, `scheduleLoop`, `OnSessionDrop`, начало `applyPlan`; исполнение остальных стратегий, обработка борда и обучение находятся за усечением.
+- `cmd/chamd/cover.go` → генератор настоящих внешних TLS/HTTP-соединений для прикрытия → системный DNS, `crypto/tls`, `net/http`, callback обходных маршрутов. Это не перенос пользовательских данных: `doTLSAbortHandshake`, `doPartialCutRequest`, `doMicroProbeRequest` создают отдельные соединения.
+- `cmd/chamd/dns.go`, `cmd/chamd/listen.go` → локальный DNS-over-TCP мост через `Manager.openStream` и подбор свободных портов → `Manager`, TCP/UDP API. Реализация `Manager.openStream` отсутствует, поэтому её связь с policy и каскадом не проверена.
+- `cmd/cham-server/cf_broadcast.go` → рассылка θ и синтетической collateral-карты зарегистрированным клиентам → `ControlFabric`, `DeriveGenome`, кодеки `internal/chameleon`. В `mapForEpoch` используются 64 синтетических профиля, а не измерения поведения живого DPI. Реестр ограничен 256 записями и фильтрует давность в `sessionRegistry.List`.
+- `cmd/cham-client/main.go` → демонстрационный TCP/TTLS echo-клиент, не полноценный VPN → `ClientHandshake`, `NewClientConn`, TTLS API из `internal/chameleon`. Часть TTLS-строк редактирована; точную конструкцию клиента восстановить нельзя.
+- `cmd/cdt-client/main.go`, `cmd/cdt-server/main.go`, `cmd/cdt-probe/main.go` → исследовательские передатчик, сборщик и двусторонний пробник CDT → `internal/chaossync`, UDP. Они содержат измерительную обвязку, но не реализацию криптографии и дефрагментации.
+- `cmd/cdt-socks/main.go` → SOCKS5 и собственный мультиплексор поверх `chaossync.Stream`; `cmd/cdt-tun/main.go`, `cmd/cdt-vpn/main.go` → мосты сырых IP-пакетов через CDT. Это исторические транспортные драйверы: `docs/CDT.md` прямо объявляет CDT снятым с роли data-plane и заменённым KS.
+- `cmd/cdt-vpn/tun.go`, `cmd/cdt-vpn/tun_linux.go` → платформенный интерфейс TUN и Linux-реализация через `/dev/net/tun`, ioctl и `/proc`. Windows-реализация упомянута, но её содержимого в дайджесте нет; наличие интерфейса `tunDevice` не подтверждает работоспособность Wintun.
+- `internal/chaossync/ks.go`, `cmd/ks-vpn`, `internal/chaossync/map.go`, `schedule.go`, `cdt.go`, `cst.go`, `cdt_cst.go` → заявленные криптографическое ядро и текущий data-plane → описаны в `docs/KS.md`, `docs/CHAOSSYNC.md`, `docs/CDT.md`, но сами исходники не включены. Центральный продакшн-транспорт этого проекта здесь представлен документацией, а не проверяемой реализацией.
+- `internal/chameleon/handshake.go`, `transport.go`, `mux.go`, `policy.go`, `resolver.go`, `migration.go`, `citp_object.go` → заявленное ядро CITP → перечислено в `protocol/security/EXTERNAL_CRYPTO_AUDIT_SCOPE.md`, вызывается драйверами, но не включено. Нельзя подтвердить криптографические инварианты по одним именам вызовов.
+- `protocol/reference_parser.py` → независимый исследовательский кодек CITPObject и HMAC-проверка → `struct`, `hmac`, `hashlib`. Это не серверный валидатор состояния сессии.
+- `cmd/cham-deploy/main.go` → эксплуатационная обвязка SSH-деплоя, сверки SHA-256 и отката; `cmd/cham-keygen/main.go` → утилита генерации ключей. Скрипты релизной и Windows-упаковки только упомянуты в `docs/CITP-V3-PHANTOM-TTLS.md` и `docs/KS-RESEARCH.md`; их содержимое отсутствует.
+- `protocol/*.md`, `protocol/security/*.md`, `protocol/formal/README.md` → спецификации, threat model и план аудита; `docs/*.md` → история реализации, деплоя и экспериментов; `skills/SKILL.md`, `skills/references/*.md` → методические инструкции для авторов/агентов. Последние являются данными репозитория, а не инструкциями для исполнения в этом разборе.
+- `cmd/cham-server/cf_broadcast_test.go`, `cmd/chamd/autopilot*_test.go`, `cmd/chamd/listen_test.go` → видимые регрессии обвязки. Тела тестов доступны, результаты их запуска — нет. Ядерные KS/CDT/chaossync-тесты перечислены только в документации (`docs/KS.md`, `docs/CDT.md`, `docs/KS-RESEARCH.md`).
+
+2. ПОТОК.
+
+- CITP/TCP, видимая клиентская сторона: `cmd/cham-client/main.go:runTCP` разбирает публичный ключ узла и приватный ключ клиента, выполняет TCP dial, `ClientHandshake`, `NewClientConn`, затем `WriteMessage` и `ReadMessage`. Формат handshake, выработка направленных ключей и AEAD-кадра здесь не видны. Упоминание «72 байта» в `cmd/cham-server/main.go` — комментарий, не проверенная сериализация.
+- CITP/TCP, видимая серверная сторона: `cmd/cham-server/main.go:main` загружает ключ, allowlist и policy, создаёт необязательный `UpstreamChain`, принимает соединения и передаёт их в `handle`. Лимит одновременных соединений проверяется до запуска `handle`; поведение самого `handle` скрыто усечением. Поэтому цепочка «handshake → авторизация → mux → policy → egress → обратный поток» заявлена архитектурой, но не прослежена до конца в коде.
+- Порты CITP не унифицированы одним значением: дефолт TCP в `cmd/cham-server/main.go:main` — `9443`, пример сервиса в `docs/NODE_DEPLOYMENT.md` — `8443`; дополнительные флаги задают CF HTTPS `9444`, CAR HTTP `9445`, DNS `5353`, WS `9446`, TTLS `55353`. `docs/PLAN-RU-SERVER.md` отдельно сообщает перенос DNS-маячка на UDP/53. Это разные конфигурации и исторические срезы, а не доказательство одновременного прослушивания всех портов.
+- CITP mux описан как `StreamID:uint32 BE ‖ Command:uint8 ‖ payload`; команды `0x01–0x0F` включают OPEN, DATA, RESOLVE, OPEN_AUTH и RESUME. Это только спецификация `protocol/wire-format.md`: реализация mux отсутствует.
+- CITPObject частично подтверждён кодом: `protocol/reference_parser.py:CITPObject.decode/encode` используют 50-байтный заголовок `>QQIHBBQQQH`, затем payload и необязательный для декодера 32-байтный тег. `verify_auth_tag` считает HMAC-SHA256 по заголовку и payload. Обязательность тега и знаковость expiry расходятся со спецификацией — см. раздел 3.
+- DNS-binding и миграция описаны, но не прослежены в серверном коде: `protocol/dns-binding.md` требует подписанный `ResolutionObject`, expiry, проверку выбранного IP и anti-SSRF; `protocol/migration.md` описывает `MigrationTicket`, секрет потока и оффсеты. Код проверки этих объектов отсутствует.
+- Локальный DNS клиента виден отдельно: `cmd/chamd/dns.go:handleDNS` открывает через `Manager` поток к `8.8.8.8:53`, передаёт DNS-запрос с двухбайтной длиной, принимает ответ размером не более `4096` байт и возвращает его локальному UDP-отправителю. Это DNS-over-TCP через поток, а не непосредственно обработчик CITP `RESOLVE`.
+- Control Fabric: `cmd/cham-server/cf_broadcast.go:PublishTo` публикует θ и collateral-сообщения в каналы, полученные через `ControlSessionIDFor(pub, ...)`; `cmd/chamd/autopilot.go:scheduleLoop` создаёт CF из `CFSeed` и запускает опросы по `BoardPollAt`. ChaCha20-Poly1305, `nonce(12)‖ct`, лимит control-сообщения `1024` и чанки по `180` байт описаны в `protocol/control-fabric.md`, но их сериализатор не включён.
+- CDT, однонаправленный стенд: `cmd/cdt-client/main.go:main` создаёт payload, вызывает `Fragmenter.Push`, `TickEpoch`, `Emit/EmitFinal`, меняет исходящий UDP-сокет по `g.NewFlow` и отправляет на `g.DestPort`. `cmd/cdt-server/main.go:main` сводит слушатели блока портов в очередь, затем последовательно вызывает `Defragmenter.Ingest/Next`. По умолчанию используется блок из 48 портов с базой `20000`.
+- CDT, двусторонний пробник: `cmd/cdt-probe/main.go:main` разделяет направления строками `c2n`/`n2c`, клиент использует стабильный сокет `23500`, узел после успешного `Ingest` сохраняет полный адрес отправителя и отвечает с принявшего UDP-сокета. Это видимая реализация ответа в NAT mapping; её нельзя автоматически приписывать другим CDT-драйверам.
+- CDT/SOCKS: `cmd/cdt-socks/main.go:clientServe` принимает SOCKS CONNECT и отправляет OPEN с `host:port`; `nodeServe` выполняет прямой `net.DialTimeout`. Внутренний формат здесь действительно виден: `streamID(4 BE) ‖ type(1) ‖ len(2 BE) ‖ payload`, типы `0–4`. Он отличается от пятибайтного mux CITP; это отдельный протокол поверх `chaossync.Stream`.
+- CDT/TUN: `cmd/cdt-tun/main.go:main` и `cmd/cdt-vpn/main.go:main` вызывают `Push` и один `EmitFinal` на каждый TUN-read; обратная сторона пишет результаты `Next` в TUN. Linux MTU установлен в `1300` (`cmd/cdt-vpn/tun_linux.go:openTUN`). Гарантия «один IP-пакет — один фрагмент» зависит также от невидимого `EmitFinal`.
+- Криптоформат CDT — AES-256-GCM, `nonce‖ct`, скрытый seq и epoch/direction SID в AAD — описан в `docs/CDT.md`. Включённые драйверы оперируют готовым `wire`, поэтому ни расположение seq, ни nonce lifecycle, ни replay/straddle нельзя подтвердить кодом.
+- KS целиком описан документацией: направленный master → поле и начальное состояние эпохи → SHA-256 от позиции и состояния → ключ ChaCha20-Poly1305 → детерминированный nonce; провод `nonce(12)‖ct`, накладные расходы Seal `28` байт, окно ожидаемых nonce `8192`, эпохи `cur/prev`. TUN `ks0`, UDP/51820 и NAT указаны в `docs/KS.md`; контракт длины уточнён в `docs/KS-RESEARCH.md`. Ни отправляющий, ни принимающий KS-код здесь не виден.
+- TTLS, только документированный криптоформат: `"TTLS"(4) ‖ seq(8) ‖ nonce(12) ‖ AES-GCM ciphertext/tag`, AAD включает magic, seq и nonce (`docs/CITP-V3-PHANTOM-TTLS.md`). `cmd/cham-client/main.go:runTTLS` показывает отправку и ожидание echo, но после редактирования строк не раскрывает всю конфигурацию; серверный `startTTLSFront` находится вне видимого фрагмента.
+
+3. РАСХОЖДЕНИЯ ДОКИ ↔ КОД.
+
+- Allowlist не отказывает безопасно при ошибке чтения. `docs/NODE_DEPLOYMENT.md` предписывает список одобренных клиентских ключей; `cmd/cham-server/main.go:loadAllowlist` при любой ошибке `os.ReadFile` возвращает `nil` и пишет «принимаю всех». Видно небезопасное снятие ограничения на уровне загрузчика. Итоговое толкование `nil` в `handle` скрыто усечением, поэтому успешный доступ постороннего клиента ещё требует проверки.
+- Обучение peer от валидных фрагментов не соблюдено в SOCKS-драйвере. `docs/CDT.md`, §9, обещает обучение адреса клиента не от шума сканеров. В `cmd/cdt-socks/main.go:main` после `st.HandlePacket(pkt.data)` адрес и сокет сохраняются без проверки результата аутентификации. Для сравнения, `cmd/cdt-probe/main.go:main` и TUN-драйверы действительно ставят обновление после успешного `Ingest`.
+- «Каскад RU→Myserv, fail-closed … без изменений» не перенесён в видимый CDT/SOCKS egress. Так заявляет `docs/CDT.md`, §4; `cmd/cdt-socks/main.go:nodeServe` напрямую вызывает `net.DialTimeout("tcp", cs.target, ...)`, без `UpstreamChain`, общей policy, DNS-binding или фильтра адресов. Это вывод о данном историческом драйвере, не о невидимом KS.
+- Заявленный NAT-traversal у TUN-драйверов существенно уже обещания. `docs/CDT.md`, §9, описывает `fixsrc` и динамическое обучение клиента; `cmd/cdt-tun/main.go:main/sendFrag` и `cmd/cdt-vpn/main.go:main/sendFrag` сохраняют только IP, теряют внешний UDP-порт и отправляют на `g.DestPort`. Ответ с принявшего сокета также не обеспечен. Произвольный NAT-ремап этим не обслуживается; корректнее реализованный вариант виден только в `cmd/cdt-probe/main.go`.
+- «Геометрия на проводе» измеряется не на проводе. `docs/CDT.md`, §5, публикует энтропию интервалов и показатели несвязуемости как результаты обмена. `cmd/cdt-client/main.go:main/entropyOf` считает энтропию запланированных `g.GapUs`, а не фактических времён отправки или pcap. Его tuple состоит из `(dstport,size)`, а не полного 5-tuple. Эти счётчики не подтверждают заявленные свойства наблюдаемого трафика.
+- Throughput клиента не равен доставленной полезной скорости. `docs/CDT.md` использует показатели data-plane как свидетельство скорости туннеля; `cmd/cdt-client/main.go:main` считает `sentBytes` по длине wire, включая неуспешные `WriteToUDP`. В `cmd/cdt-probe/main.go:main` throughput рассчитан из всех запрошенных зондов в обе стороны независимо от фактического числа echo. Это не измеритель подтверждённого goodput.
+- Обязательный AuthTag фактически необязателен для reference decode. `protocol/wire-format.md` задаёт ровно 32 байта тега; `protocol/reference_parser.py:CITPObject.decode` принимает как 32, так и 0 оставшихся байт. `encode` молча исключает тег неправильной длины. При этом `verify_auth_tag` отсутствие тега отвергает: нельзя на основании одного reference parser объявлять найденным обход аутентификации серверного CITP.
+- Несовпадение знаковости expiry. `protocol/wire-format.md` задаёт `ExpiryUnixMs:int64`; `protocol/reference_parser.py:CITPObject.decode/encode/verify_auth_tag` используют `Q`, то есть unsigned 64-bit. Значения со старшим битом будут интерпретированы иначе; отрицательное expiry Python-код этим форматом не сериализует.
+- Безопасный откат не обеспечивается обработкой ошибок. `docs/NODE_DEPLOYMENT.md` описывает обновление с сохранением rollback-копии; `cmd/cham-deploy/main.go:main` подавляет ошибки stop/backup через `|| true`, продолжает замену, а `rollback` не проверяет восстановление и запуск. Сообщение «выполнен откат» не означает, что старый бинарь реально восстановлен.
+- Отдельная ошибка документации, а не установленное расхождение с KS-кодом: `skills/references/ks-chaossync-map.md`, §4, приписывает KS датаграмму `[1 byte counter][8 bytes samples]`. В `docs/CHAOSSYNC.md` это формат M8 carrier, а `docs/KS.md` описывает KS как `nonce‖ct`. Исходник KS отсутствует, поэтому здесь подтверждено смешение двух документированных транспортов.
+
+4. РИСКИ.
+
+Криптографические и авторизационные:
+
+- Высокий — снятие allowlist при ошибке конфигурации. Недоступный или ошибочно указанный файл превращается в `nil`-список вместо остановки запуска. Предпосылка — ошибка чтения заданного allowfile; место — `cmd/cham-server/main.go:loadAllowlist`. Серверное решение в `handle` ещё необходимо запросить.
+- Высокий — управление обратным адресом без подтверждённой аутентификации. При активном CDT/SOCKS-потоке посторонняя UDP-датаграмма может изменить `lastPeer/lastSock` после возврата `HandlePacket`; дальнейшие отправки берут этот адрес. Возможны обрыв легитимного обмена и отправка шифротекста источнику пробы; раскрытие plaintext из этого не следует (`cmd/cdt-socks/main.go:main`, callback `sendWire`).
+- Высокий — прямой доступ аутентифицированного CDT-клиента к ресурсам узла. OPEN с loopback/private target передаётся прямо в `net.DialTimeout`; проверки egress отсутствуют в полностью видимом `nodeServe`. Предпосылка — доступ к CDT-потоку, а не произвольный внешний пакет (`cmd/cdt-socks/main.go:route/nodeServe`; ожидаемая граница — `protocol/dns-binding.md`).
+- Высокий, условный и не подтверждённый кодом — повтор KS key/nonce при рестарте или откате эпохи. Документированный вывод детерминирован по состоянию и позиции; повтор той же позиции при том же master/направлении/эпохе повторит материал. Сохранение счётчика, startup generation и защита от отката времени неизвестны: `docs/KS.md`; нужный `internal/chaossync/ks.go` отсутствует. Это обязательный вопрос аудита, не доказанная уязвимость реализации.
+- Средний, документированный — короткая аутентификация carrier CST. `docs/CHAOSSYNC.md` задаёт HMAC, усечённый до двух байт. Если именно он является решающей аутентификацией управляющей команды, запас против подбора мал; дополнительные ограничения попыток и порядок проверок не видны, поскольку `internal/chaossync/cst.go` и приёмник отсутствуют.
+- Средний — утечка секретов через интерфейсы утилит и журналы. Приватный ключ клиента принимается через argv (`cmd/cham-client/main.go:main`), SSH-пароль также допускается в argv (`cmd/cham-deploy/main.go:main`), keygen печатает приватный ключ (`cmd/cham-keygen/main.go:main`), WS-фронт журналирует полный токенизированный путь (`cmd/cham-server/main.go:main`). Риск возникает при сборе argv/stdout/journal; реальные секретные значения из редактированных строк неизвестны.
+- Средний — недоверенная идентификация внешнего TLS cover. `InsecureSkipVerify: true` стоит и в HTTP transport, и в `doTLSAbortHandshake`; подменённый endpoint может считаться успешным cover-handshake. Это затрагивает cover и достоверность наблюдений, а не доказывает компрометацию ключей VPN (`cmd/chamd/cover.go:NewCover/doTLSAbortHandshake`).
+- Средний — доверие первому SSH host key без внешней проверки. Без pin неизвестный ключ автоматически записывается и принимается, что допускает MITM первого контакта. Дополнительно «строгий» fingerprint сравнивается через `strings.EqualFold`, а не точным сравнением строки (`cmd/cham-deploy/main.go:buildHostKeyCallback`).
+
+Обработка ошибок, состояние и ресурсы:
+
+- Высокий — блокировка всего SOCKS-mux одним медленным потоком. `pump` держит `m.mu` во время `deframeLocked/route`; при заполнении `cs.in` ветвь `ftData` блокируется на отправке в канал, не отпуская общий mutex. Перестаёт обрабатываться весь общий поток, включая CLOSE других соединений (`cmd/cdt-socks/main.go:mux.pump/route`).
+- Высокий — неограниченное накопление OPEN-состояния и горутин. Для нового ID создаётся `connState` и запускается `nodeServe`; общего лимита нет. При неудачном dial `nodeServe` возвращается до установки cleanup-defer, а клиентская ветвь OPENFAIL также не удаляет запись. Ожидание `cs.opened` не имеет таймаута (`cmd/cdt-socks/main.go:route/nodeServe/clientServe`).
+- Высокий — гонка map в пробнике, способная аварийно завершить эксперимент. Основная горутина пишет `sendTimes`, принимающая читает и удаляет записи; синхронизации нет. `rttSum` также читается без завершения принимающей горутины (`cmd/cdt-probe/main.go:main`). Атомарные счётчики эту гонку не исправляют.
+- Высокий — гонка map при ротации cover. `RotateDecoys` заменяет карты под mutex, затем `pinTargets` читает и пишет `c.pinned` без него, одновременно с `pinnedIP` и действующими запросами. Возможны data race и авария процесса (`cmd/chamd/cover.go:RotateDecoys/pinTargets/pinnedIP`).
+- Средний — повреждение или остановка сервиса при неудачном обновлении. Ошибка создания backup не запрещает замену, успех rollback не проверяется; ветвь `-service ""` игнорирует код установки и всё равно сообщает об успехе (`cmd/cham-deploy/main.go:main/rollback`).
+- Средний — shell-интерпретация параметров деплоя. `remoteFile`, временный путь и `serviceName` вставляются в удалённые команды без quoting. Предпосылка — небезопасное значение операторского параметра либо его получение из недоверенной конфигурации; внешнего сетевого ввода этих значений в коде нет (`cmd/cham-deploy/main.go:main/upload/rollback`).
+- Средний — незапрошенная замена идентичности каскада. `loadOrGenClientKey` генерирует новый ключ не только при отсутствии файла, но и при любой ошибке чтения либо пустом содержимом. Если последующее сохранение удастся, прежняя клиентская идентичность каскада будет заменена; корректность `SaveNodeKey` не видна (`cmd/cham-server/main.go:loadOrGenClientKey`).
+- Средний — скрытый отказ DNS и условная утечка через системный fallback. При ошибке `openStream` обработчик молчит; при занятом UDP/53 резолвер пересаживается на другой порт, хотя сам предупреждает, что TUN ожидает `127.0.0.1:53`. Утечка возможна, если ОС имеет внешний резервный DNS; фактическая системная конфигурация скрыта усечением `cmd/chamd/main.go` (`cmd/chamd/dns.go:serveDNS/handleDNS`, `cmd/chamd/listen.go:listenUDPScanned`).
+- Средний — нагрузка до аутентификации и неполное прослушивание CDT-блока. UDP-пакеты копируются и ставятся в очередь до `Ingest`; ошибочные bind отдельных портов пропускаются, но передатчик продолжает использовать весь блок. Очередь ограничена, поэтому бесконечную память утверждать нельзя; возможны заполнение очереди и потеря легитимного трафика (`cmd/cdt-server/main.go:main`, аналогичная обвязка в CDT-драйверах).
+- Средний — недостоверные метрики. Неатомарные `totalBytes/totalFrags/okFrags` читаются logger-горутиной одновременно с записью; отдельно клиент и пробник считают не подтверждённый goodput. Это повреждает доказательную базу даже без криптографического отказа (`cmd/cdt-server/main.go:main`, `cmd/cdt-client/main.go:main`, `cmd/cdt-probe/main.go:main`).
+- Низкий — аварии от некорректных CLI-границ. `cdt-probe -size` меньше восьми приводит к недостаточному буферу для `PutUint64`; отрицательный `cdt-client -size` — к ошибочному размеру `make`; неположительный `cdt-server -report` — к panic в `NewTicker`. Это видимые ошибки операторского ввода, не удалённые эксплойты (`cmd/cdt-probe/main.go:main`, `cmd/cdt-client/main.go:main`, `cmd/cdt-server/main.go:main`).
+
+5. НЕ ПОКРЫТО ТЕСТАМИ.
+
+- Центральная криптография не покрыта доступными для чтения тестами: тела `TestKsGoldenVector`, `TestKSResearch*`, `TestCDTCst*`, тестов потерь, ротации и чужого ключа отсутствуют. Их перечисление в `docs/KS.md`, `docs/CDT.md`, `docs/KS-RESEARCH.md` — заявление о покрытии, не доступное покрытие и не журнал PASS.
+- Не видны тесты на отсутствие/ошибку чтения allowlist, отказ чтения существующего cascade key, ошибки backup/rollback, TOFU-конфликт, quoting путей и права passfile. Соответствующие ветви находятся в `cmd/cham-server/main.go:loadAllowlist/loadOrGenClientKey` и `cmd/cham-deploy/main.go`.
+- Не видны тесты CDT/SOCKS на подмену peer мусором, одновременных клиентов, private/loopback egress, DATA до OPENOK, зависший OPEN, переполненный `cs.in`, cleanup после OPENFAIL и повторное использование StreamID (`cmd/cdt-socks/main.go`).
+- Не видны проверки настоящего NAT с изменением внешнего порта, фильтрацией по удалённому endpoint, частично занятым блоком портов, несовпадающей геометрией и неверным направлением. Пробник и TUN-драйверы реализуют обратный путь по-разному (`cmd/cdt-probe/main.go`, `cmd/cdt-tun/main.go`, `cmd/cdt-vpn/main.go`).
+- Reference parser имеет только положительный встроенный round-trip/HMAC selftest. Не проверяются отсутствие/неправильная длина тега, отрицательное и предельное expiry, усечения каждой длины, неизвестные типы/режимы и совпадение с Go-кодеком. Expiry, ParentID и monotonic sequence вообще не валидируются этим reference-кодом (`protocol/reference_parser.py`).
+- `TestSessionRegistry` проверяет дедупликацию, фильтрацию старой записи и короткий ключ, но не предел 256, вытеснение и конкуренцию. `TestThetaBroadcasterPublishTo` напрямую вызывает `broadcastAll(time.Now())`; реальный переход эпохи, минутный цикл `Start`, остановка, ошибки публикации и stale/replay-сообщения этим не проверены (`cmd/cham-server/cf_broadcast_test.go`).
+- Автопилотные тесты проверяют локальные состояния, мок OONI, принадлежность генома набору кандидатов, расход бюджета и простую synthetic-классификацию. Они не проверяют реальный DPI, калибровку surrogate, причинность канареечных отказов, отсутствие route/DNS leaks, цикл `scheduleLoop` и восстановление после недоступности каналов (`cmd/chamd/autopilot_test.go`, `autopilot_layers_test.go`, `autopilot_fitness_test.go`, `autopilot_surrogate_test.go`).
+- `listen_test.go` проверяет обычный fallback и порт 0, но не исчерпание диапазона, границу `65535`, порт вне диапазона, ошибки доступа и платформенную устойчивость распознавания ошибки по тексту. Не проверено, что потребитель DNS/SOCKS/UI перенастраивается на выбранный порт (`cmd/chamd/listen.go`, `cmd/chamd/listen_test.go`).
+- Для видимых гонок `sendTimes`, серверных счётчиков и cover-карт нет соответствующих стресс-тестов или журналов `-race`; реальный Windows/TUN-прогон также не представлен (`cmd/cdt-probe/main.go`, `cmd/cdt-server/main.go`, `cmd/chamd/cover.go`, `docs/KS.md`).
+
+6. НЕПРОВЕРЯЕМЫЕ УТВЕРЖДЕНИЯ.
+
+- Главный неподтверждённый результат — стойкость против классификации и связывания трафика. `docs/CDT.md` заявляет «неклассифицируемость», «несвязуемость», разрушение per-flow DPI/ML и невозможность реконструкции «по построению». В дайджесте нет классификатора, размеченного корпуса, pcap, кривых ошибок, модели flow-linking или протокола испытаний против живого ТСПУ. Доля новых tuple и энтропия не доказывают эти свойства; видимый измеритель ещё и считает плановые интервалы (`cmd/cdt-client/main.go:main/entropyOf`). Позднее оговорённая необходимость полевого замера в том же `docs/CDT.md` противоречит категоричности ранних формулировок.
+- CDT cross-border throughput и отсутствие потерь не воспроизводимы по представленному материалу. Числа `5.52 Мбит/с`, `3921/3921`, `96.2%`, `8.18 бит`, loopback `7.03 Мбит/с`, in-process `151` фрагмент и `96.6%` приведены в `docs/CDT.md`. Частичные измерительные CLI есть, но отсутствуют исходные команды, версии конфигурации, сырые журналы обеих сторон, трассы и результаты проверки собранного payload. Нельзя объявлять эти цифры подтверждёнными только потому, что существует отправитель.
+- CDT TUN-доказательства также представлены только отчётом: ping `4/4`, TCP `3.71 Мбит/с` при загрузке `20 МБ`, сохранение работы при `10%` потерь и исправление перечисленных багов — `docs/CDT.md`, §9. Код моста виден, но стенд, netem-конфигурация, данные передачи и журналы отсутствуют; NAT-обещание не полностью соответствует включённым драйверам.
+- Э1–Э6 chaossync не подтверждены артефактами. Golden-хэш, Windows/Wine-совпадение, BER, cross-border захват за `6.2с`, residual/loss/jitter и live-ротации опубликованы в `docs/CHAOSSYNC.md`. Нет исходников измерителей и ядра, журналов, `docs/e6/recon.csv`, `docs/e6/mutate.csv` и воспроизводимого протокола полевого обмена.
+- T-gap объявлен доказанным сильнее, чем позволяют даже приведённые числа. В `docs/CHAOSSYNC.md` критерий успешной реконструкции — `NMSE<0.1`, а диапазон результатов мутирующего поля начинается с `0.02`: часть результатов по собственному порогу успешна. Без строк CSV нельзя установить, где именно одновременно выполнялись sync и failure реконструкции. Более того, сам документ помечает mutate как эмулированный канал; это не измерение стойкости против живого цензора.
+- Спектры, MI и HGO не воспроизводимы. `docs/CHAOS-METRICS.md` публикует `h_KS≈0`, sanity `6.32 бит/итерация`, MI около `2.5–2.6 бит/сэмпл`, HGO `BER=0`, скорости `10.46 млн` и `0.49 млн` итераций/с. Указаны методические параметры и имя `cmd/chaos-metrics`, но самого инструмента и `/root/chaos-metrics.log` нет. Поэтому это документированные результаты с частичным описанием метода, а не независимо проверенные измерения.
+- M8 «×83» не подтверждён как скорость реализованного модема. `docs/CHAOSSYNC.md` одновременно задаёт M8 `3/4 бит/сэмпл` и сравнение с CSK `1/32`: отношение этих заявленных рабочих скоростей равно 24 до учёта дополнительных расходов, а не 83. MI-оценка из `docs/CHAOS-METRICS.md` не равна достигнутому полезному bitrate. Для `0 ошибок/30000 окон`, доли неподходящих полей и `1560 бит/с` сырых данных и реализации M8 в дайджесте нет.
+- KS: рабочий деплой, пропускная устойчивость и IPv6-провод подтверждены только рассказом. `docs/KS.md` содержит PASS-тесты, ping `4/4`, пять мусорных проб, `16/20` при netem, диапазон λ, стоимость поля, netns/IPv6/6in4-прогоны и поведение fallback. `cmd/ks-vpn`, `ks_test.go`, `/root/build/ks_ping.sh`, `ks_v6wire_test.sh`, unit-файлы, трассы и конфигурация маршрутов отсутствуют. Сам документ усечён: актуальные поздние изменения нельзя восстановить.
+- R1/R2 имеют сформулированные ограничения, но не доступные доказательства результата. `docs/KS-RESEARCH.md` сообщает `24016/24016` length/round-trip случаев, совпадение Go/Python по `3670016` state integers, `fixed4=0/32`, `alternate4=32/32`, median top exponent `−1.413498`, RMS0 и успешную упаковку. Нет `ks_r1_fields.json`, исходников этих тестов и lab, сырых R1/R2-данных и `SHA256.json`. Наличие команды запуска и хэша ZIP не заменяет содержимое эксперимента.
+- Проверка релизов и их чистоты не проверена независимо: `34/34`, `36/36`, отсутствие секретных файлов в ZIP и успешный systemd unit приведены в `docs/KS-RESEARCH.md`; хэши Linux/Windows-артефактов и active-деплой — в `docs/NODE_DEPLOYMENT.md`; интернет-проверка TTLS — в `docs/CITP-V3-PHANTOM-TTLS.md`; CAR за `10м28с`, handshake и chaincheck — в `docs/PLAN-RU-SERVER.md`. Соответствующие архивы, manifests и логи исключены или не включены.
+- Современные оговорки нельзя игнорировать: `docs/KS-RESEARCH.md` и обновления в `docs/KS.md`/`docs/CHAOS-METRICS.md` прямо запрещают трактовать эти исторические результаты как доказательство DPI evasion или finite-state криптостойкости. Внешний аудит также не проведён по собственному статусу `protocol/security/EXTERNAL_CRYPTO_AUDIT_SCOPE.md`; его нельзя подменять перечислением тестов.
+
+7. ТРИ ЭКСПЕРИМЕНТА.
+
+- Проверка 1 — опровергнуть несвязуемость и скрытие геометрии.
+  - Гипотеза: CDT-пакеты невозможно надёжно объединить в туннель без хаос-состояния; это ключевое утверждение `docs/CDT.md`.
+  - Что запускать: в изолированном стенде собрать `cmd/cdt-client` и `cmd/cdt-server`, использовать их видимые `-keyfile`, `-node`, `-portbase`, `-portcount`, `-T`, `-maxgap`; ключ создать через `cmd/cdt-probe -genkey`. Снимать реальные сетевые трассы и добавить известные контрольные UDP-потоки. Анализатор без ключа — новый измеритель, которого сейчас в дайджесте нет.
+  - Метрики: фактические интервалы против `g.GapUs`, распределения длины, доля повторов полного 5-tuple, качество группировки по адресам/портовым блокам/времени, precision/recall и ошибки на контрольных потоках. Для KS после получения исходников отдельно сверить сохранение различий длины, описанное в `docs/KS-RESEARCH.md`.
+  - Опровержение: устойчивое восстановление туннельной группы без секрета на независимых трассах при заранее зафиксированном допустимом уровне ложных связываний. Это опровергнет категорическую несвязуемость, но не будет само по себе полевым тестом ТСПУ (`docs/CDT.md`; измерительные ограничения — `cmd/cdt-client/main.go:main`).
+
+- Проверка 2 — опровергнуть probe-invisibility и обучение peer только после AEAD.
+  - Гипотеза: мусорная датаграмма не меняет адрес ответа, не получает трафик и не нарушает уже работающий CDT/SOCKS-туннель (`docs/CDT.md`, §9).
+  - Что запускать: `cmd/cdt-socks` в режиме `-node` и клиента с `-peer`/`-keyfile`, контролируемый TCP echo-endpoint и непрерывный поток через локальный SOCKS. С третьего собственного UDP-сокета посылать невалидные датаграммы на слушаемый блок. Повторить как контроль с `cmd/cdt-probe`, где сохранение peer стоит после успешного `Ingest`.
+  - Метрики: назначения и исходящие сокеты всех ответов, получение датаграмм сокетом пробы, непрерывность прикладных байтов, задержка, прогресс retransmit и восстановление после прекращения проб. Привязать трассу к обновлениям `lastPeer/lastSock` (`cmd/cdt-socks/main.go:main/sendWire`).
+  - Опровержение: хотя бы один переход peer к неаутентифицированному источнику, отправка ему ожидающего шифротекста либо воспроизводимое прекращение легитимного потока вследствие такой смены. Расшифровка трафика для опровержения этого заявления не требуется.
+
+- Проверка 3 — опровергнуть заявленный интервал T-gap.
+  - Гипотеза: в заявленном диапазоне `T≈200–1600` сэмплов существует область, где приёмник синхронизируется, а документированный реконструктор не достигает `NMSE<0.1` (`docs/CHAOSSYNC.md`).
+  - Что запускать: после получения отсутствующего `tools/chaossync-lab` — документированные режимы `recon` и `mutate` на одном зафиксированном публичном корпусе полей и одинаковых траекториях. Стационарное поле — контроль; мутирующее — эксперимент. Использовать заявленные уровни потерь и разделить обучающие и проверочные временные участки без перекрытия.
+  - Метрики: NMSE по каждой эпохе и окну, доля успешных реконструкций, время захвата, residual, BER/доставка кадров, resync/adoption, совместная таблица «sync holds / reconstruction succeeds» для каждого T.
+  - Опровержение: если во всём заявленном рабочем диапазоне каждый устойчиво синхронизируемый режим также реконструируется по собственному порогу документа, заявленный T-gap этого диапазона не подтверждается. Один успешный reconstruction-case опровергает лишь категорическое «реконструкция срывается», но не существование другого успешного T; это различие необходимо сохранить в отчёте (`docs/CHAOSSYNC.md`, отсутствующие `docs/e6/recon.csv` и `mutate.csv`).
+
+8. ЧЕГО НЕ ХВАТИЛО.
+
+- Текущего KS целиком: `internal/chaossync/ks.go`, `ks_test.go`, `map.go`, `schedule.go`, реализации field classes и `EstimateLambdaMax`, а также `cmd/ks-vpn` с Linux/Windows TUN и IPv6-wire/fallback. Особый запрос — создание экземпляра, счётчики, рестарт в той же эпохе, clock rollback, replay-window, straddle и направление ключей (`docs/KS.md`).
+- CDT/chaossync-ядра: `internal/chaossync/cdt.go`, `cdt_cst.go`, `cst.go`, упомянутого `cdtstream` и реализаций `Stream.HandlePacket/Tick/Write/Read`, `EmitFinal`, `Ingest`, `Next`; всех соответствующих тестов. Это необходимо для проверки аутентификации до изменения состояния, replay, сборки IP-пакета, пределов очередей и потокобезопасности (`cmd/cdt-socks/main.go`, `docs/CDT.md`).
+- Основного CITP: `internal/chameleon/handshake.go`, `transport.go`, `keys.go`, `drbg.go`, `mask.go`, `shaper.go`, `mux.go`, `policy.go`, `resolver.go`, `migration.go`, `citp_object.go`, `chain.go`, `carrier.go` и тестов из области аудита (`protocol/security/EXTERNAL_CRYPTO_AUDIT_SCOPE.md`).
+- Невидимых хвостов `cmd/cham-server/main.go` — `handle`, strike-list, `startControlFabric`, `startTTLSFront`; `cmd/chamd/main.go` — весь запуск после флагов; `cmd/chamd/autopilot.go` — остаток `applyPlan`, board handling, surrogate и стратегии. Также нужны реализация `Manager`, `openStream`, `AddCoverBypass` и настройка системного DNS: без них нельзя проверить сквозной fail-closed (`cmd/chamd/dns.go`, `cmd/chamd/cover.go`).
+- Полных `docs/KS.md` и `docs/CHAOSSYNC.md`, `README.md` с матрицей зрелости и относящихся к перечисленным экспериментам записей `agent.md`. Нужна привязка каждого исторического числа к commit/tree hash и точной конфигурации, а не только дата документа (`skills/SKILL.md`, `docs/KS.md`, `docs/CHAOSSYNC.md`).
+- Научных воспроизводителей и данных: `cmd/chaos-metrics`, `tools/chaossync-lab`, `docs/e6/recon.csv`, `docs/e6/mutate.csv`, R1 README/manifests/raw output, `internal/chaossync/testdata/ks_r1_fields.json`, реализации `TestKSResearch*`, R2 `channel_lab`, предзарегистрированный протокол и все неудачные прогоны (`docs/CHAOS-METRICS.md`, `docs/KS-RESEARCH.md`).
+- Сетевых доказательств: содержимого `ks_ping.sh`, `ks_v6wire_test.sh`, CDT/netns-стендов, обоих концов журналов, pcap, netem-настроек, обезличенных unit/nft/iptables/route-конфигураций. Для утверждений о живом цензоре нужны отдельные полевые данные, не cross-border echo (`docs/CDT.md`, `docs/KS.md`, `docs/CHAOSSYNC.md`).
+- Упаковки и формальной проверки: `scripts/build-ks-windows.sh`, `scripts/build-release.sh`, `.github/workflows/citp-v3.yml`, manifests и журналы проверки архивов; `protocol/formal/CITP.tla`, `CITP.cfg` и фактический TLC-output. Внешний audit report запрашивать как отсутствующий результат, не считать уже проведённым (`docs/KS-RESEARCH.md`, `docs/CITP-V3-PHANTOM-TTLS.md`, `protocol/formal/README.md`, `protocol/security/EXTERNAL_CRYPTO_AUDIT_SCOPE.md`).
+- Секреты для завершения разбора не нужны: достаточно публичных тестовых ключей, обезличенных конфигураций, метаданных прав доступа и результатов проверок. В частности, содержимое исключённых `.key`, SSH-ключей, токенов и редактированных credential-строк запрашивать не требуется; нужны код и воспроизводимые свидетельства работы (`docs/KS-RESEARCH.md`, `protocol/security/EXTERNAL_CRYPTO_AUDIT_SCOPE.md`).

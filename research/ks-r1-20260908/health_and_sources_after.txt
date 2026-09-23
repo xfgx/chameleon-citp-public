@@ -1,0 +1,10 @@
+2026-09-08T18:03:38Z
+your-node.example.com
+active
+active
+active
+1c70557dff5f07d379fdc8f89c7b2d747a8e7bdf25e1a998868d595b4e3dbc10  /root/vpn/internal/chaossync/ks.go
+9e23bfd6a4e95e9e843a1762d8ac6b32b3960bf4fda152883aa5b23bfe5f4498  /root/vpn/internal/chaossync/map.go
+8966243704fcd2d696246a5d802ebc2aa84ed71ecae3ae90bb525e4b0c7e5cce  /root/vpn/internal/chaossync/fxp.go
+d2976227418aeed427017e6b73b38d3081982aad7af9006b2f1705b4ff293a02  /root/vpn/internal/chaossync/ks_test.go
+88a6e5da533fa898cdb26768045aef806c168947287e3a9a4012de0d212586cd  /root/vpn/internal/chaossync/schedule.go

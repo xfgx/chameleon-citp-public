@@ -1,0 +1,11 @@
+{
+  "routes4_unchanged": true,
+  "routes6_unchanged": true,
+  "rules4_unchanged": true,
+  "rules6_unchanged": true,
+  "nft_unchanged": true,
+  "netns_unchanged": true,
+  "services_unchanged": true,
+  "temporary_listener_and_process_check_empty": true,
+  "ephemeral_private_keys_removed": true
+}

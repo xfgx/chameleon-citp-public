@@ -1,0 +1,9 @@
+{"event":"dial","endpoint":"[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443","time":"2026-09-05T11:34:15.926384834Z"}
+{"event":"dial_failed","endpoint":"[2001:db8:300:0:6d98:eeb7:614b:a58f]:24443","detail":"dial tcp [2001:db8:300:0:6d98:eeb7:614b:a58f]:24443: i/o timeout","time":"2026-09-05T11:34:17.126738457Z"}
+{"event":"dial","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","time":"2026-09-05T11:34:17.126769621Z"}
+{"event":"dial_failed","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","detail":"dial tcp [2001:db8:300:0:7345:dd12:8ac0:ae81]:24443: i/o timeout","time":"2026-09-05T11:34:18.327161247Z"}
+{"event":"dial","endpoint":"[2001:db8:300:0:198e:5b25:680:acd]:24443","time":"2026-09-05T11:34:18.327200634Z"}
+{"event":"dial_failed","endpoint":"[2001:db8:300:0:198e:5b25:680:acd]:24443","detail":"dial tcp [2001:db8:300:0:198e:5b25:680:acd]:24443: i/o timeout","time":"2026-09-05T11:34:19.527461483Z"}
+{"event":"probe_failed","sequence":1,"detail":"all explicit endpoints unavailable: fail closed","time":"2026-09-05T11:34:19.52749894Z"}
+{"event":"summary","sequence":1,"detail":"success=0 attempted=1","time":"2026-09-05T11:34:19.527509781Z"}
+{"event":"fatal","detail":"one or more probes failed","time":"2026-09-05T11:34:19.527514309Z"}

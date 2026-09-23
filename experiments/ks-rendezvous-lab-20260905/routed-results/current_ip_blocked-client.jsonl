@@ -1,0 +1,8 @@
+{"event":"dial","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","time":"2026-09-05T11:34:07.357047432Z"}
+{"event":"dial_failed","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","detail":"dial tcp [2001:db8:300:0:7345:dd12:8ac0:ae81]:24443: i/o timeout","time":"2026-09-05T11:34:08.557638264Z"}
+{"event":"dial","endpoint":"[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443","time":"2026-09-05T11:34:08.557673172Z"}
+{"event":"connected","endpoint":"[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443","detail":"TLS1.3, verified node key","time":"2026-09-05T11:34:08.56039418Z"}
+{"event":"probe_ok","endpoint":"[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443","sequence":1,"time":"2026-09-05T11:34:08.561125002Z"}
+{"event":"probe_ok","endpoint":"[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443","sequence":2,"time":"2026-09-05T11:34:08.571959121Z"}
+{"event":"probe_ok","endpoint":"[2001:db8:300:0:1988:d6d8:4dc0:c2bc]:24443","sequence":3,"time":"2026-09-05T11:34:08.582909934Z"}
+{"event":"summary","sequence":3,"detail":"success=3 attempted=3","time":"2026-09-05T11:34:08.582965239Z"}

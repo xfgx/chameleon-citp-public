@@ -1,0 +1,6 @@
+{"event":"dial","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","time":"2026-09-05T11:34:07.318586799Z"}
+{"event":"connected","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","detail":"TLS1.3, verified node key","time":"2026-09-05T11:34:07.321748018Z"}
+{"event":"probe_ok","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","sequence":1,"time":"2026-09-05T11:34:07.322836345Z"}
+{"event":"probe_ok","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","sequence":2,"time":"2026-09-05T11:34:07.333516059Z"}
+{"event":"probe_ok","endpoint":"[2001:db8:300:0:7345:dd12:8ac0:ae81]:24443","sequence":3,"time":"2026-09-05T11:34:07.344043614Z"}
+{"event":"summary","sequence":3,"detail":"success=3 attempted=3","time":"2026-09-05T11:34:07.344095644Z"}

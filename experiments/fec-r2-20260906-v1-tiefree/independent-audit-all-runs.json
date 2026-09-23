@@ -1,0 +1,51 @@
+{
+  "method": "independent powerset recoverability recomputation from raw client and server logs; no new transmissions",
+  "no_payload_reuse_across_runs": true,
+  "runs": [
+    {
+      "cases_reconciled": 376,
+      "certificate_equals_exhaustive_optimum": 376,
+      "controls_reconciled": 4,
+      "decoded_hash_checks": 5105,
+      "descriptor_raw_bits_larger_than_dense_basis": 187,
+      "directory": "fec-r2-20260906-v1",
+      "fresh_unique_source_symbols": 1900,
+      "scores_by_case": "omitted (sweep)",
+      "strictly_beats_equal_weight_recommendation": 84,
+      "strictly_beats_greedy": 1,
+      "verified": true
+    },
+    {
+      "cases_reconciled": 376,
+      "certificate_equals_exhaustive_optimum": 376,
+      "controls_reconciled": 4,
+      "decoded_hash_checks": 5087,
+      "descriptor_raw_bits_larger_than_dense_basis": 187,
+      "directory": "fec-r2-20260906-v1-confirmation",
+      "fresh_unique_source_symbols": 1900,
+      "scores_by_case": "omitted (sweep)",
+      "strictly_beats_equal_weight_recommendation": 98,
+      "strictly_beats_greedy": 3,
+      "verified": true
+    },
+    {
+      "cases_reconciled": 3,
+      "certificate_equals_exhaustive_optimum": 3,
+      "controls_reconciled": 4,
+      "decoded_hash_checks": 30,
+      "descriptor_raw_bits_larger_than_dense_basis": 1,
+      "directory": "fec-r2-20260906-v1-tiefree",
+      "fresh_unique_source_symbols": 35,
+      "scores_by_case": {
+        "space_000": {
+          "certificate": 9,
+          "greedy": 7,
+          "recommendation": 9
+        }
+      },
+      "strictly_beats_equal_weight_recommendation": 0,
+      "strictly_beats_greedy": 1,
+      "verified": true
+    }
+  ]
+}

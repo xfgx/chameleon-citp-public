@@ -1,0 +1,15 @@
+{
+  "node": "MCP-host",
+  "returncode": 0,
+  "stdout": "{\n  \"interface\": \"eth0\",\n  \"started_utc\": \"2026-09-05T11:20:39.155370+00:00\",\n  \"window_seconds\": 6,\n  \"solicitations_sent\": 1,\n  \"router_advertisements\": [],\n  \"configuration_applied\": false,\n  \"warning\": \"Observation only; absence is not proof that static IPv6 is unavailable; RAs are unauthenticated.\"\n}\n",
+  "stderr": "",
+  "health_unchanged": {
+    "routes4": true,
+    "routes6": true,
+    "rules4": true,
+    "rules6": true,
+    "nft": true,
+    "netns": true,
+    "services": true
+  }
+}

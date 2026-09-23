@@ -1,0 +1,15 @@
+[Unit]
+Description=Chameleon chaossync — chaos-sync transport node (experimental)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/build
+ExecStart=/root/build/chaossync-server -keyfile /root/build/cb.key -listen 0.0.0.0:4500 -metrics 127.0.0.1:19090 -T 8 -c 0.85 -rate 1000 -S 32 -batch 4
+Restart=always
+RestartSec=3
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target

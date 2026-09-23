@@ -1,0 +1,6 @@
+{
+  "first_transfer_rejected_before_file_creation": true,
+  "reason": "extra two base64 characters; padding failure",
+  "verified_source_sha256": "ad03ef442e98bf5777629ddce7d3f5ecde9899af1fcee2c4ef9e14c0d20c75ba",
+  "experimental_source_or_raw_modified": false
+}

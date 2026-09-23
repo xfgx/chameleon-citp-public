@@ -1,0 +1,119 @@
+{
+  "all_checks_passed": true,
+  "cases": 5040,
+  "code_coefficients": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    3,
+    30
+  ],
+  "completion_controls_passed": 5040,
+  "counterexample_found": true,
+  "deadline_arrival_count": 4,
+  "implementation": "CPython",
+  "labels": [
+    "S0",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "P01",
+    "P1234"
+  ],
+  "novelty": "calibration of known partial-decoding principles; novelty not claimed",
+  "positive_control_decoded": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "python": "3.12.14",
+  "raw_sha256": "21f2a8287752b986779dd0c6b095c7573b050621c6f2224a8d20816ed87ed825",
+  "same_set_order_invariance_controls_passed": 5040,
+  "saved_records_rechecked": 5040,
+  "scope": "exact finite abstract code calibration; not a VPN or network benchmark",
+  "source_sha256": "1cfbd2791783f34ebd2ea11c9cb6958533da137a48fffd7ac8a46fb20594c166",
+  "source_symbols": 5,
+  "statistical_interpretation": "none; complete finite permutation space, not traffic probabilities",
+  "transmitted_symbols": 7,
+  "witness": {
+    "completion_decodable_both": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "left": {
+      "arrival_labels": [
+        "S0",
+        "S1",
+        "S2",
+        "P1234",
+        "S3",
+        "P01",
+        "S4"
+      ],
+      "decoded_sources": [
+        0,
+        1,
+        2
+      ],
+      "eventual_loss": 0,
+      "inversions": 4,
+      "order": [
+        0,
+        1,
+        2,
+        6,
+        3,
+        5,
+        4
+      ],
+      "rank_before_deadline": 4,
+      "recoverable_count": 3,
+      "systematic_before_deadline": 3
+    },
+    "matched_key": {
+      "inversions": 4,
+      "rank_before_deadline": 4,
+      "systematic_before_deadline": 3
+    },
+    "right": {
+      "arrival_labels": [
+        "S0",
+        "S2",
+        "S3",
+        "P01",
+        "S1",
+        "S4",
+        "P1234"
+      ],
+      "decoded_sources": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "eventual_loss": 0,
+      "inversions": 4,
+      "order": [
+        0,
+        2,
+        3,
+        5,
+        1,
+        4,
+        6
+      ],
+      "rank_before_deadline": 4,
+      "recoverable_count": 4,
+      "systematic_before_deadline": 3
+    },
+    "truth_table_confirmation": true
+  }
+}

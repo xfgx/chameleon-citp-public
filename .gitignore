@@ -1,0 +1,42 @@
+# Local configuration and credentials
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+known_hosts
+client.key
+server.key
+secrets/
+private/
+
+# Build outputs and local state
+/dist/
+/build/
+*.exe
+*.dll
+*.so
+*.aar
+*.apk
+*.log
+*.pid
+.DS_Store
+
+# Client-local configuration and generated identity
+/data/
+servers.json
+client.key
+netprofile.jsonl
+
+# Archives anywhere (incl. backups) - contents unknown, keep out of VCS
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.tar.xz
+*.7z
+*.rar
+
+# Local deploy/ops tooling state
+.transfer/

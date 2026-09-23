@@ -1,0 +1,143 @@
+{
+  "release": "vpn-adaptive-20260918-01",
+  "created_at": "2026-09-18T12:34:32.015205+00:00",
+  "build_host": "your-node.example.com",
+  "go": "go version go1.26.3 linux/amd64",
+  "checks": {
+    "targeted": {
+      "packages": {
+        "chameleon/internal/chameleon": "pass",
+        "chameleon/cmd/chamd": "pass"
+      },
+      "top_level_tests_and_fuzz_seeds": 30,
+      "passed_subtests": 9,
+      "log_path": "/root/build/vpn-adaptive-20260918-01/results/targeted.jsonl",
+      "log_sha256": "249552ddcb8af6317b398681e88fab62640888eaedd832f29cfcf771026c9fe0"
+    },
+    "unit": {
+      "packages": {
+        "chameleon/cmd/chamd": "pass",
+        "chameleon/cmd/cham-server": "pass",
+        "chameleon/internal/chameleon": "pass"
+      },
+      "top_level_tests_and_fuzz_seeds": 177,
+      "passed_subtests": 26,
+      "log_path": "/root/build/vpn-adaptive-20260918-01/results/unit.jsonl",
+      "log_sha256": "e03a84bf301c079dc60218037268fb3858fe328c74c9c9b49201b05b71650c9a"
+    },
+    "race": {
+      "packages": {
+        "chameleon/cmd/chamd": "pass",
+        "chameleon/cmd/cham-server": "pass",
+        "chameleon/internal/chameleon": "pass"
+      },
+      "top_level_tests_and_fuzz_seeds": 177,
+      "passed_subtests": 26,
+      "log_path": "/root/build/vpn-adaptive-20260918-01/results/race.jsonl",
+      "log_sha256": "7027f0947334c6c96e194913360ea057e0d9c7ec3e8dd8d669c1f3440280e2c6"
+    }
+  },
+  "vet": {
+    "linux": "pass",
+    "windows_amd64": "pass"
+  },
+  "artifacts": {
+    "cham-server-linux-amd64": {
+      "sha256": "4fd3e0b73e4bfc0c1c7e8ea6ade09da4b8ea8fa7c3ed92b21d4ee52cee107139",
+      "bytes": 7962786
+    },
+    "cham-client-linux-amd64": {
+      "sha256": "5bc8f644a914f1423861a2ae92451b6eb23424c0af34503938fb5ff53caba872",
+      "bytes": 4419746
+    },
+    "chamd-windows-amd64.exe": {
+      "sha256": "7398f97babd6d3c03aa9c8d934801b995dd24a101cb7696a1a5f57772e45edc2",
+      "bytes": 12652032
+    },
+    "cham-client-windows-amd64.exe": {
+      "sha256": "ef0aaf9309035870d0df964c73b32c8925a9ec945f02ed6695fd8529dc0e7335",
+      "bytes": 4604416
+    },
+    "fieldtest-linux-amd64": {
+      "sha256": "a91f436ca98d0e5a07bc53527519271a9942e66a6bf8f68275b511f11b89a2d5",
+      "bytes": 6664354
+    },
+    "fieldtest-windows-amd64.exe": {
+      "sha256": "d97230b9f2f4dd481330f70928a73859740ddcfb74467ec4c935123a0e952ca3",
+      "bytes": 6888448
+    }
+  },
+  "sources_sha256": {
+    "internal/chameleon/transport.go": "073b60e0a2d24a489937421ac20795bf9b73575300f1cbbabfe7278ce56070ce",
+    "internal/chameleon/shaper.go": "6bdeb36bd6739bb5766d56ea546c5c1fe8174cdb4eed747a06b9e5b1a0e90fe5",
+    "internal/chameleon/resolver.go": "add637261e4232b7949a9aacdac2ed67d9aa0f5f227b17636d41d69dc323fb0a",
+    "internal/chameleon/mux.go": "96a176d92ee486d0624f94a1cb2e1b7df8e4739f989b98ec84dcdf1156897c01",
+    "internal/chameleon/cf_theta.go": "33771fb8fe23aa6c5190662af672afdb0ce719f7213eb00095c8289b20347e40",
+    "internal/chameleon/strategy_survival.go": "27fa4bf3a76ce0838c2704813c6df2186230bf1f006680053f94649b138e0d18",
+    "internal/chameleon/strategy_validation.go": "c979569a2880924c2d2857646a21ec8cd1ded8ffd2f4455104bc4fc1a219a661",
+    "internal/chameleon/semantic_scheduler.go": "75c65d60291c621256c330f21ca7c58c8cd2b2d8d2f82c080ad0defecaff8151",
+    "internal/chameleon/resolution_issuance.go": "64d6ff3f36bcadae3046b52636cb9600d7e25213b18708f68730adfb42cb074f",
+    "internal/chameleon/strategy_survival_test.go": "f92588ec17d2d8bc6412acb36a5f87abd4a0e89e76f336ac0043450fe1e8c49c",
+    "internal/chameleon/semantic_scheduler_test.go": "ab8b69c6ec086f7dbecd2281e435efdbe57c9c3d7cd8014707c8d7f8868ac3ca",
+    "internal/chameleon/resolution_canonical_test.go": "4d32e6e8c203da7a8d7f6c492fd0c54f9136036d47c8adab3e5118be3a46defb",
+    "cmd/chamd/autopilot.go": "383787fc6900de1d04209bd50f633a641b7fbcf4fcce3e6239996cec9df70e9a",
+    "cmd/chamd/manager.go": "09fa83747dd0b4a5af84af80e0e20c59a58d7a73cf4981d2722649fa6bfc9393",
+    "cmd/chamd/strategy_session.go": "ba782028ef218f35062c7b756f084de994d6b5e49b68c77715ab0fe2525e7102",
+    "cmd/chamd/strategy_session_test.go": "ba8960d4fe3fabc201d1da3e96102d3027d34ddf7664f5e7be7fdbe1a943dec4",
+    "cmd/chamd/autopilot_layers_test.go": "9479e9340f29792803c98a449fe4123cef020845e16aada0a74234131787b329",
+    "cmd/chamd/autopilot_surrogate_test.go": "b9d022b19c7ac1b9c4ee52b693be79ac5d25bd4895429e02f9701041fbf48aae",
+    "internal/chameleon/chain_test.go": "2d5258bb7bbc751fdb7190b7cae0abff09041bbf80a3e578a769cad10bed48f6"
+  },
+  "original_sources_sha256": {
+    "internal/chameleon/transport.go": "4f509c87ab6f640250c04f90af1467883620c3753522a1f68c7088f205cb3f58",
+    "internal/chameleon/shaper.go": "5995b4d4ffdbb024882ad8a3323a34dd1b658f7ea1747b8dbef8756f6435b8bc",
+    "internal/chameleon/resolver.go": "adecb9909acd77bccdd51a97c0734fb595bfa98dbdd55d34ac10c7a9b09e37a6",
+    "internal/chameleon/mux.go": "d0e8c400042caede317288f6267a9e367d4640acafdb3889b4352d744baa4865",
+    "internal/chameleon/cf_theta.go": "7a1073b9f5d3c079bec6bba588d74c3da9fdcc3c256961bd971d2a8d864c572c",
+    "internal/chameleon/strategy_survival.go": null,
+    "internal/chameleon/strategy_validation.go": null,
+    "internal/chameleon/semantic_scheduler.go": null,
+    "internal/chameleon/resolution_issuance.go": null,
+    "internal/chameleon/strategy_survival_test.go": null,
+    "internal/chameleon/semantic_scheduler_test.go": null,
+    "internal/chameleon/resolution_canonical_test.go": null,
+    "cmd/chamd/autopilot.go": "23084528c00cc3d11f5bfeac2e536fb42de83c11d8b4f7092563407cff604e7c",
+    "cmd/chamd/manager.go": "c7670a4bdc8be2fc5a12c34b4bc20e192fd7f79989e5ba006d79892d11b604cb",
+    "cmd/chamd/strategy_session.go": null,
+    "cmd/chamd/strategy_session_test.go": null,
+    "cmd/chamd/autopilot_layers_test.go": "a7ad4c68d58868f3a7ccb382dcf83472ff6c61a6e16343cd37c9e875d4a5164f",
+    "cmd/chamd/autopilot_surrogate_test.go": "d5b4edf03e2134038c9fa736ba63b2cd07088b58d97689517d6bfaa3e1aeeaa2",
+    "internal/chameleon/chain_test.go": "ad54c175c1253a2628a412b76fa0f0a135385daae7f313e7fa061de1a8606992"
+  },
+  "runtime_deployed": false,
+  "production_service_state_unchanged": true,
+  "resolution_auth_version": 2,
+  "requires_coordinated_update": "Clients and every CHAM server/upstream hop; v2 deliberately rejects legacy DNS MACs.",
+  "implementation_scope": {
+    "strategy_learning": "chamd records payload-bearing session outcomes, not handshake success or exogenous labels; candidate-specific decayed estimates affect ranking with enough support.",
+    "cover_traffic": "Live Stream.Write payload and pending data gate the shared shaper/padding budget.",
+    "citp_deadlines_latest_only": "Implemented and tested in SendCITPObject. Current application traffic has no production callers of this API; no claim of deployment to ordinary UDP workloads.",
+    "dns_binding": "Canonical length-delimited v2 MAC, per-session issuance registry, and no silent fallback on auth, timeout or policy errors. Authenticated explicit cascade delegation is retained."
+  },
+  "not_verified": [
+    "Real user-side DPI/TSPU A/B effectiveness",
+    "Windows execution",
+    "Android rebuild",
+    "External cryptographic audit"
+  ],
+  "excluded_external_test": {
+    "test": "TestE2EUDPRelay",
+    "reason": "Hardcoded remote endpoint; isolated baseline failed with network unreachable. Local integration and cascade tests ran."
+  },
+  "test_environment": {
+    "private_network": true,
+    "cpu_quota": "100%",
+    "memory_max": "1100M",
+    "gomaxprocs": 2
+  },
+  "backup": {
+    "directory": "/root/backup/vpn-adaptive-20260918-01",
+    "source_sha256": "54cbfa08a3f7d9ba7de3c1cc84c35455bf586eefaf3ae2c6bec247b5d37b8960",
+    "runtime_sha256": "4cf3d591edcbfa24ddb148eb9d03bae42c32a2148dbac279ffa81568fc9c012e"
+  }
+}

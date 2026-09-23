@@ -1,0 +1,106 @@
+func natScript(tun string) string {
+	return `#!/bin/sh
+# ks-exit-nat.sh <wan-iface> — NAT для ` + tunNet + ` и forward между ` + tun + ` и WAN.
+#
+# История двух реальных дефектов, найденных в поле (v1..v4):
+#   1. Цепочка называлась "fwd", а fwd — КЛЮЧЕВОЕ СЛОВО nft
+#      (fwd to <dev>). nft отвергал синтаксис, цепочка НИКОГДА не
+#      создавалась. Здесь она называется ksfwd.
+#   2. Docker держит в ip filter FORWARD policy drop. Своя nft-таблица с
+#      policy accept ЭТОГО НЕ ПЕРЕОПРЕДЕЛЯЕТ: drop в любой таблице на
+#      hook forward выигрывает. Разрешать надо в DOCKER-USER — это
+#      официальная точка расширения Docker, она не теряется при его
+#      рестарте и обрабатывается ДО DOCKER-FORWARD.
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/usr/bin:/bin
+WAN="$1"
+TUN="` + tun + `"
+NET="` + tunNet + `"
+warn() { echo "ks-exit-nat: WARN: $*" >&2; }
+# run печатает НАСТОЯЩИЙ текст ошибки, а не глотает его в /dev/null.
+run() {
+	out=$("$@" 2>&1); rc=$?
+	if [ $rc -ne 0 ]; then warn "$* -> rc=$rc: $out"; fi
+	return $rc
+}
+if [ -z "$WAN" ]; then echo "ks-exit-nat: FATAL: не задан WAN-интерфейс" >&2; exit 1; fi
+
+echo 1 > /proc/sys/net/ipv4/ip_forward 2>/dev/null || warn "не смог выставить ip_forward"
+# loose rp_filter: пути в каскаде асимметричные.
+# На момент ExecStartPre интерфейса $TUN ещё нет — это нормально.
+for f in all "$TUN"; do
+	p=/proc/sys/net/ipv4/conf/$f/rp_filter
+	if [ -w "$p" ]; then
+		echo 2 > "$p" 2>/dev/null || warn "rp_filter $f"
+	fi
+done
+
+# ---------- 1. MASQUERADE (единственный фатальный шаг) ----------
+MASQ_OK=0
+if command -v nft >/dev/null 2>&1; then
+	nft add table ip ksx_nat 2>/dev/null
+	nft add chain ip ksx_nat post '{ type nat hook postrouting priority srcnat; }' 2>/dev/null
+	nft flush chain ip ksx_nat post 2>/dev/null
+	if run nft add rule ip ksx_nat post ip saddr $NET oifname "$WAN" counter masquerade; then
+		MASQ_OK=1
+	fi
+fi
+if [ $MASQ_OK -eq 0 ] && command -v iptables >/dev/null 2>&1; then
+	if iptables -t nat -C POSTROUTING -s $NET -o "$WAN" -j MASQUERADE 2>/dev/null; then
+		MASQ_OK=1
+	elif run iptables -t nat -A POSTROUTING -s $NET -o "$WAN" -j MASQUERADE; then
+		MASQ_OK=1
+	fi
+fi
+if [ $MASQ_OK -eq 0 ]; then
+	echo "ks-exit-nat: FATAL: не смог поставить masquerade ($NET -> $WAN)" >&2
+	exit 1
+fi
+
+# ---------- 2. FORWARD (best-effort, но без него трафика не будет) ----------
+FWD_OK=0
+FWD_WHERE=""
+if command -v iptables >/dev/null 2>&1; then
+	# 2a. Если есть Docker — его же точка расширения.
+	if iptables -L DOCKER-USER -n >/dev/null 2>&1; then
+		iptables -C DOCKER-USER -i "$TUN" -o "$WAN" -j ACCEPT 2>/dev/null \
+			|| run iptables -I DOCKER-USER -i "$TUN" -o "$WAN" -j ACCEPT
+		iptables -C DOCKER-USER -i "$WAN" -o "$TUN" -j ACCEPT 2>/dev/null \
+			|| run iptables -I DOCKER-USER -i "$WAN" -o "$TUN" -j ACCEPT
+		if iptables -C DOCKER-USER -i "$TUN" -o "$WAN" -j ACCEPT 2>/dev/null; then
+			FWD_OK=1
+			FWD_WHERE="DOCKER-USER"
+		fi
+	fi
+	# 2b. Обычный FORWARD.
+	if [ $FWD_OK -eq 0 ]; then
+		iptables -C FORWARD -i "$TUN" -o "$WAN" -j ACCEPT 2>/dev/null \
+			|| run iptables -I FORWARD -i "$TUN" -o "$WAN" -j ACCEPT
+		iptables -C FORWARD -i "$WAN" -o "$TUN" -j ACCEPT 2>/dev/null \
+			|| run iptables -I FORWARD -i "$WAN" -o "$TUN" -j ACCEPT
+		if iptables -C FORWARD -i "$TUN" -o "$WAN" -j ACCEPT 2>/dev/null; then
+			FWD_OK=1
+			FWD_WHERE="FORWARD"
+		fi
+	fi
+fi
+# 2c. Чистый nft-хост без iptables. Поможет только если чужого drop нет.
+if [ $FWD_OK -eq 0 ] && command -v nft >/dev/null 2>&1; then
+	nft add table ip ksx_fw 2>/dev/null
+	nft add chain ip ksx_fw ksfwd '{ type filter hook forward priority 0; }' 2>/dev/null
+	nft flush chain ip ksx_fw ksfwd 2>/dev/null
+	if run nft add rule ip ksx_fw ksfwd iifname "$TUN" oifname "$WAN" counter accept; then
+		FWD_OK=1
+		FWD_WHERE="nft ksx_fw"
+	fi
+	run nft add rule ip ksx_fw ksfwd iifname "$WAN" oifname "$TUN" counter accept
+fi
+
+if [ $FWD_OK -eq 0 ]; then
+	warn "forward разрешить НЕ УДАЛОСЬ — трафик клиентов не пойдёт в интернет"
+else
+	echo "ks-exit-nat: forward OK ($TUN <-> $WAN) в $FWD_WHERE"
+fi
+echo "ks-exit-nat: готов ($NET -> $WAN)"
+exit 0
+`
+}

@@ -1,0 +1,261 @@
+{
+  "burst-boundary": {
+    "checkpoint-reset": {
+      "slots": 8192,
+      "max_slots": 8319,
+      "steps": 16543,
+      "high": 8351,
+      "gen": 16543,
+      "restores": 0
+    },
+    "checkpoint-retain": {
+      "slots": 8192,
+      "max_slots": 8255,
+      "steps": 16543,
+      "high": 8351,
+      "gen": 16543,
+      "restores": 0
+    },
+    "frontier": {
+      "slots": 8192,
+      "max_slots": 8319,
+      "steps": 16543,
+      "high": 8351,
+      "gen": 16543,
+      "restores": 0
+    },
+    "legacy-16384": {
+      "slots": 16383,
+      "max_slots": 16383,
+      "steps": 16543,
+      "high": 0,
+      "gen": 16543,
+      "restores": 0
+    },
+    "legacy-8192": {
+      "slots": 8191,
+      "max_slots": 8191,
+      "steps": 8351,
+      "high": 0,
+      "gen": 8351,
+      "restores": 0
+    }
+  },
+  "corruption-replay": {
+    "checkpoint-reset": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8193,
+      "high": 1,
+      "gen": 8193,
+      "restores": 0
+    },
+    "checkpoint-retain": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8193,
+      "high": 1,
+      "gen": 8193,
+      "restores": 0
+    },
+    "frontier": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8193,
+      "high": 1,
+      "gen": 8193,
+      "restores": 0
+    },
+    "legacy-16384": {
+      "slots": 16384,
+      "max_slots": 16384,
+      "steps": 16385,
+      "high": 0,
+      "gen": 16385,
+      "restores": 0
+    },
+    "legacy-8192": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8193,
+      "high": 0,
+      "gen": 8193,
+      "restores": 0
+    }
+  },
+  "cumulative-loss": {
+    "checkpoint-reset": {
+      "slots": 8256,
+      "max_slots": 8256,
+      "steps": 48192,
+      "high": 40000,
+      "gen": 48192,
+      "restores": 0
+    },
+    "checkpoint-retain": {
+      "slots": 8224,
+      "max_slots": 8224,
+      "steps": 48192,
+      "high": 40000,
+      "gen": 48192,
+      "restores": 0
+    },
+    "frontier": {
+      "slots": 8256,
+      "max_slots": 8256,
+      "steps": 48192,
+      "high": 40000,
+      "gen": 48192,
+      "restores": 0
+    },
+    "legacy-16384": {
+      "slots": 16384,
+      "max_slots": 16384,
+      "steps": 32767,
+      "high": 0,
+      "gen": 32767,
+      "restores": 0
+    },
+    "legacy-8192": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 16383,
+      "high": 0,
+      "gen": 16383,
+      "restores": 0
+    }
+  },
+  "event_count": 20881,
+  "long-gap": {
+    "checkpoint-reset": {
+      "slots": 8192,
+      "max_slots": 8224,
+      "steps": 16576,
+      "high": 32960,
+      "gen": 41152,
+      "restores": 1
+    },
+    "checkpoint-retain": {
+      "slots": 8192,
+      "max_slots": 8224,
+      "steps": 16576,
+      "high": 32960,
+      "gen": 41152,
+      "restores": 1
+    },
+    "frontier": {
+      "slots": 8192,
+      "max_slots": 8224,
+      "steps": 8256,
+      "high": 64,
+      "gen": 8256,
+      "restores": 0
+    },
+    "legacy-16384": {
+      "slots": 16384,
+      "max_slots": 16384,
+      "steps": 16448,
+      "high": 0,
+      "gen": 16448,
+      "restores": 0
+    },
+    "legacy-8192": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8256,
+      "high": 0,
+      "gen": 8256,
+      "restores": 0
+    }
+  },
+  "long-gap-no-checkpoint": {
+    "checkpoint-reset": {
+      "slots": 8192,
+      "max_slots": 8224,
+      "steps": 8256,
+      "high": 64,
+      "gen": 8256,
+      "restores": 0
+    },
+    "checkpoint-retain": {
+      "slots": 8192,
+      "max_slots": 8224,
+      "steps": 8256,
+      "high": 64,
+      "gen": 8256,
+      "restores": 0
+    },
+    "frontier": {
+      "slots": 8192,
+      "max_slots": 8224,
+      "steps": 8256,
+      "high": 64,
+      "gen": 8256,
+      "restores": 0
+    },
+    "legacy-16384": {
+      "slots": 16384,
+      "max_slots": 16384,
+      "steps": 16448,
+      "high": 0,
+      "gen": 16448,
+      "restores": 0
+    },
+    "legacy-8192": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8256,
+      "high": 0,
+      "gen": 8256,
+      "restores": 0
+    }
+  },
+  "no-loss": {
+    "checkpoint-reset": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8448,
+      "high": 256,
+      "gen": 8448,
+      "restores": 0
+    },
+    "checkpoint-retain": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8448,
+      "high": 256,
+      "gen": 8448,
+      "restores": 0
+    },
+    "frontier": {
+      "slots": 8192,
+      "max_slots": 8192,
+      "steps": 8448,
+      "high": 256,
+      "gen": 8448,
+      "restores": 0
+    },
+    "legacy-16384": {
+      "slots": 16383,
+      "max_slots": 16383,
+      "steps": 16639,
+      "high": 0,
+      "gen": 16639,
+      "restores": 0
+    },
+    "legacy-8192": {
+      "slots": 8191,
+      "max_slots": 8191,
+      "steps": 8447,
+      "high": 0,
+      "gen": 8447,
+      "restores": 0
+    }
+  },
+  "source_restart_characterization": {
+    "initial_packet_accepted": true,
+    "new_instance_accepts_old_packet": true,
+    "same_epoch_restart_repeats_nonce": true,
+    "same_instance_replay_rejected": true
+  }
+}
