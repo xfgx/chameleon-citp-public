@@ -1,0 +1,6 @@
+# False positives: HMAC pseudocode from the protocol specification
+# (docs describe key derivation formulas, not real keys)
+docs/CITP-V3-PHANTOM-TTLS.md:generic-api-key:21
+backups/antidpi-20260909T190500Z/VPN-process-layer/docs/CITP-V3-PHANTOM-TTLS.md:generic-api-key:21
+backups/antidpi-20260909T190500Z/astra/repo-batch.txt:generic-api-key:5
+backups/antidpi-20260909T190500Z/astra/repo-digest.txt:generic-api-key:396

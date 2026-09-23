@@ -1,0 +1,31 @@
+services:
+  server:
+    build:
+      context: ../../..
+      dockerfile: test/e2e/Dockerfile.server
+    command: ["-listen", "0.0.0.0:9443", "-keyfile", "/run/e2e/server.key", "-allowfile", "/run/e2e/clients.txt"]
+    volumes:
+      - e2e-keys:/run/e2e
+    networks: [e2e]
+    healthcheck:
+      test: ["CMD", "test", "-f", "/run/e2e/server.ready"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  e2e:
+    build:
+      context: ../../..
+      dockerfile: test/e2e/Dockerfile.e2e
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      - e2e-keys:/run/e2e
+    networks: [e2e]
+
+networks:
+  e2e:
+
+volumes:
+  e2e-keys:

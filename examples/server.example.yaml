@@ -1,0 +1,15 @@
+# Пример конфигурации серверной ноды Chameleon CITP
+# Все значения-плейсхолдеры замените своими (см. README, раздел «Ключи и доступ»).
+
+listen: "0.0.0.0:9443"            # адрес прослушивания
+keyfile: "/etc/chameleon/server.key"    # приватный ключ ноды (cham-server -genkey)
+allowfile: "/etc/chameleon/clients.txt" # allowlist публичных ключей клиентов
+
+max_connections: 1024
+
+cbr: "40ms"      # интервал CBR-паддинга (0 = выкл)
+flavor: "auto"   # маска ритма трафика
+
+# Опционально: bulletin board (Control Fabric)
+cf_board_url: "https://cham-bulletin.your-account.workers.dev"
+# Токен записи НЕ здесь — только через переменную окружения CITP_CF_BOARD_TOKEN

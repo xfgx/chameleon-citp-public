@@ -1,0 +1,17 @@
+FROM golang:1.26-bookworm AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY cmd ./cmd
+COPY internal ./internal
+COPY mobilecore ./mobilecore
+RUN GOOS=linux go build -trimpath -o /out/cham-client ./cmd/cham-client \
+ && GOOS=linux go build -trimpath -o /out/cham-keygen ./cmd/cham-keygen
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=build /out/cham-client /usr/local/bin/cham-client
+COPY --from=build /out/cham-keygen /usr/local/bin/cham-keygen
+COPY test/e2e/run-e2e.sh /usr/local/bin/run-e2e.sh
+RUN chmod +x /usr/local/bin/run-e2e.sh
+ENTRYPOINT ["/usr/local/bin/run-e2e.sh"]

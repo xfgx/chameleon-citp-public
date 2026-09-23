@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: build+test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.6'
+          check-latest: true
+      - name: go vet
+        run: go vet ./...
+      - name: go test (race)
+        run: go test -race ./...
+      - name: go build
+        run: go build ./...
+
+  lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.6'
+          check-latest: true
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+  security:
+    name: vuln + secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.6'
+          check-latest: true
+      - name: govulncheck
+        uses: securego/govulncheck-action@master
+        with:
+          args: ./...
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  binaries:
+    name: cross-build binaries
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.6'
+          check-latest: true
+      - name: build release binaries
+        run: make release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chameleon-binaries
+          path: dist/

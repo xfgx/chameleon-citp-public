@@ -1,0 +1,9 @@
+{
+  "node": "your-node.example.com:9443",
+  "server_public_key": "<SERVER_PUBLIC_KEY_BASE64>",
+  "client_key_file": "client.key",
+  "tun": true,
+  "autopilot": true,
+  "cbr": "40ms",
+  "flavor": "auto"
+}

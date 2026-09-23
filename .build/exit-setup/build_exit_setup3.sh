@@ -6,10 +6,10 @@ export PATH=/usr/local/go/bin:/usr/sbin:/sbin:/usr/bin:/bin
 
 SRC=/root/build/exit-setup
 OUT=/root/dist/exit-setup
-KSVPN_STATIC=/root/build/fixroute-20260902/ks-vpn-linux-static
+"<REDACTED>"
 KEY_SRC=/root/build/ks-hop2.key
-WANT_KS=6155b10dbba2a59199b37f6890be647461dae0d94b054d70207b4df3c559ebdb
-WANT_KEY=73b699e642d6a45bd7c331e6bf90bfeffd91494073c3ad1935cfbbae57ff794a
+"<REDACTED>"
+"<REDACTED>"
 
 echo "=== 1. гейты встраиваемых артефактов ==="
 GOT_KS=$(sha256sum "$KSVPN_STATIC" | cut -d' ' -f1)

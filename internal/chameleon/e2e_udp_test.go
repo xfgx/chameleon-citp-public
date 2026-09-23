@@ -4,16 +4,20 @@ import (
 	"encoding/binary"
 	"io"
 	"net"
+	"os"
 	"testing"
 	"time"
 )
 
 // E2E против реальной ноды: UDP-релей DNS через туннель.
 func TestE2EUDPRelay(t *testing.T) {
-	if testing.Short() {
-		t.Skip("ручной e2e")
+	addr := os.Getenv("CITP_E2E_ADDR")
+	serverPub := os.Getenv("CITP_E2E_SERVER_PUB")
+	clientKey := os.Getenv("CITP_E2E_CLIENT_KEY")
+	if addr == "" || serverPub == "" || clientKey == "" {
+		t.Skip("live e2e: задайте CITP_E2E_ADDR, CITP_E2E_SERVER_PUB, CITP_E2E_CLIENT_KEY")
 	}
-	conn, err := DialNode("198.51.100.10:8443", "hCs_ISiKS_DPbsA3mD2xhcHaIDa9d1G_AbYGBkBlAnc", "u8YsDqXXbSpHtCtiFLu92OB3_DFRj1g9GE3OEGpHB3s", 10*time.Second)
+	conn, err := DialNode(addr, serverPub, clientKey, 10*time.Second)
 	if err != nil {
 		t.Fatal(err)
 	}

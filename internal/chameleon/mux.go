@@ -42,6 +42,21 @@ const (
 	smResumeOK   = 0x0E // подтверждение возобновления
 	smResumeErr  = 0x0F // отказ в возобновлении
 
+	// CST (Continuity Stream Transport): криптография непрерывности
+	// поверх мультиплексора. См. continuity.go, knowledge.go.
+	smCSTCap       = 0x10 // capability handshake (CSTHello)
+	smCSTOpen      = 0x11 // открытие CST-потока
+	smCSTOpenOK    = 0x12 // подтверждение открытия
+	smCSTOpenErr   = 0x13 // ошибка открытия
+	smCSTAttach    = 0x14 // присоединение к существующему FlowID
+	smCSTAttachOK  = 0x15 // подтверждение присоединения
+	smCSTAttachErr = 0x16 // ошибка присоединения
+	smCSTDelta     = 0x17 // дельта данных потока
+	smCSTAck       = 0x18 // подтверждение дельт
+	smCSTClose     = 0x19 // закрытие потока
+	smCSTSnapshot  = 0x1A // snapshot/compaction (CSTSnapshot)
+	smCSTDetach    = 0x1B // detach от FlowID (CSTDetach)
+
 	muxHeader           = 5
 	muxMaxData          = 60000
 	openTimout          = 15 * time.Second
@@ -161,6 +176,9 @@ type Mux struct {
 	lastErr error
 
 	rtt atomic.Int64 // последний измеренный RTT, наносекунды (клиентская сторона)
+
+	// cstB — атомарная связка с knowledge-слоем CST (см. knowledge.go).
+	cstB atomic.Pointer[cstBinding]
 
 	// Клиентский кэш DNS-binding: домен → подписанный нодой объект,
 	// чтобы не платить лишний RESOLVE-RTT на каждое соединение.
@@ -376,6 +394,9 @@ func (m *Mux) kill(err error) {
 	if m.conn != nil {
 		_ = m.conn.Close()
 	}
+	if b := m.cstB.Load(); b != nil && b.onKill != nil {
+		b.onKill(err)
+	}
 	for _, s := range ss {
 		s.closeInput()
 		s.mu.Lock()
@@ -476,6 +497,62 @@ func (m *Mux) loop() {
 				select {
 				case s.openDone <- e:
 				default:
+				}
+			}
+		case smCSTCap, smCSTOpen, smCSTOpenOK, smCSTOpenErr,
+			smCSTAttach, smCSTAttachOK, smCSTAttachErr,
+			smCSTDelta, smCSTAck, smCSTClose, smCSTSnapshot, smCSTDetach:
+			if b := m.cstB.Load(); b != nil && b.h != nil {
+				p := append([]byte(nil), payload...)
+				switch cmd {
+				case smCSTCap:
+					if b.h.onHello != nil {
+						b.h.onHello(m, p)
+					}
+				case smCSTOpen:
+					if b.h.onOpen != nil {
+						b.h.onOpen(m, p)
+					}
+				case smCSTOpenOK:
+					if b.h.onOpenOK != nil {
+						b.h.onOpenOK(m, p)
+					}
+				case smCSTOpenErr:
+					if b.h.onOpenErr != nil {
+						b.h.onOpenErr(m, p)
+					}
+				case smCSTAttach:
+					if b.h.onAttach != nil {
+						b.h.onAttach(m, p)
+					}
+				case smCSTAttachOK:
+					if b.h.onAttachOK != nil {
+						b.h.onAttachOK(m, p)
+					}
+				case smCSTAttachErr:
+					if b.h.onAttachErr != nil {
+						b.h.onAttachErr(m, p)
+					}
+				case smCSTDelta:
+					if b.h.onDelta != nil {
+						b.h.onDelta(m, p)
+					}
+				case smCSTAck:
+					if b.h.onAck != nil {
+						b.h.onAck(m, p)
+					}
+				case smCSTClose:
+					if b.h.onClose != nil {
+						b.h.onClose(m, p)
+					}
+				case smCSTSnapshot:
+					if b.h.onSnapshot != nil {
+						b.h.onSnapshot(m, p)
+					}
+				case smCSTDetach:
+					if b.h.onDetach != nil {
+						b.h.onDetach(m, p)
+					}
 				}
 			}
 		case smPing: // keepalive — отвечаем эхом (нужно только серверу, но безвредно везде)
@@ -786,7 +863,7 @@ func ServeMuxWithEgress(conn *Conn, dialTimeout time.Duration, policy *PolicyEng
 	serveMuxWithConfig(conn, dialTimeout, policy, onCITP, egress, egressUDP, true)
 }
 
-func serveMuxWithConfig(conn *Conn, dialTimeout time.Duration, policy *PolicyEngine, onCITP func(m *Mux, obj *CITPObject), egress, egressUDP func(hostport string) (net.Conn, error), resolveDisabled bool) {
+func serveMuxWithConfig(conn *Conn, dialTimeout time.Duration, policy *PolicyEngine, onCITP func(m *Mux, obj *CITPObject), egress, egressUDP func(hostport string) (net.Conn, error), resolveDisabled bool, cstCfg ...*CSTServerConfig) {
 	m := newMux(conn)
 	m.onCITP = onCITP
 	m.policy = policy
@@ -924,6 +1001,10 @@ func serveMuxWithConfig(conn *Conn, dialTimeout time.Duration, policy *PolicyEng
 		m.send(sid, smResumeOK, nil)
 	}
 
+	if len(cstCfg) > 0 && cstCfg[0] != nil && cstCfg[0].Registry != nil {
+		reg := cstCfg[0].Registry
+		m.SetCSTBinding(&cstBinding{h: reg.serverHandlers(m, cstCfg[0], dialTimeout), onKill: func(error) { reg.detachMux(m) }})
+	}
 	m.loop()
 }
 
